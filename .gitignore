@@ -1,0 +1,34 @@
+# Zugangsdaten und lokale Konfiguration
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+.claude/settings.local.json
+.claude/worktrees/
+
+# Abhängigkeiten und erzeugte Dateien
+node_modules/
+.next/
+dist/
+build/
+coverage/
+test-results/
+playwright-report/
+.venv/
+__pycache__/
+*.log
+
+# Laufzeitdaten und interne Quellen
+uploads/
+storage/
+backups/
+private/
+*.db
+*.sqlite
+*.sqlite3
+
+# Betriebssystem
+.DS_Store
+Thumbs.db
