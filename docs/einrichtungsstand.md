@@ -12,19 +12,24 @@ Stand: 21. Oktober 2026.
 - Benutzer hat Workspace-Vertrauen selbst bestätigt.
 - Claude hat die Projektunterlagen gelesen und alle sechs Unteragenten als tatsächlich aufrufbare Agententypen erkannt. Ein Probelauf der einzelnen Rollen ist noch nicht erfolgt.
 
-## Lokale Werkzeuglücke
+## Reguläre Git Installation
 
-Claude meldet, dass der Kurzaufruf git in seiner PowerShell-Sitzung nicht gefunden wird. Git ist für die bisherige Vorbereitung unter folgendem vollständigen Pfad verfügbar und wurde darüber erfolgreich verwendet:
+Git for Windows wurde über winget (Paket Git.Git) installiert. Installer-Hashprüfung und Installation waren erfolgreich.
 
-`C:\Users\jango\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\git\cmd\git.exe`
+- Version: 2.55.0.windows.5, die zum Installationszeitpunkt von winget angebotene Version.
+- Installationspfad: `C:\Program Files\Git\cmd\git.exe`.
+- `C:\Program Files\Git\cmd` ist dauerhaft im Windows-Systemsuchpfad eingetragen.
+- Mit dem aus den Windows-Einstellungen frisch geladenen Suchpfad löst `git` auf diese Installation auf; `git --version` funktioniert.
+- Die neue Installation kann das Projekt öffnen; main war bei der Prüfung mit origin/main synchron.
+- Claude lief während der Installation mit einer Architekturaufgabe weiter. Nach deren Abschluss Claude vollständig neu starten und den Kurzaufruf in einer neuen Sitzung prüfen. Alte Prozesse übernehmen Suchpfadänderungen nicht automatisch.
 
-Dieser Pfad gehört zu einer verwalteten Codex-Laufzeit und kann sich bei Änderungen der Installation ändern. Er ist ein vorläufiger Weg, keine dauerhafte Projektabhängigkeit. Vor regulärer Entwicklung eine normale Git-for-Windows-Installation beziehungsweise einen stabilen Suchpfad prüfen und abstimmen. Keine Anwendung soll diesen Git-Pfad zur Laufzeit benötigen.
+Der zuvor genutzte Codex-interne Git-Pfad ist für die reguläre Entwicklung nicht mehr vorgesehen. Es wurden keine globalen Git-Autorenangaben geändert; die bestätigte Identität bleibt projektbezogen.
 
 Claudes Einrichtungsbericht wurde teilweise vor dem ersten Commit erstellt. Seine Aussage „noch kein Commit“ ist inzwischen überholt. Das ist kein Fehler im Repository.
 
 ## Noch offen
 
-- Dauerhaft nutzbare Git-Installation für Claude prüfen; Upload aus der aktuellen Vorbereitung funktioniert.
+- Nach Abschluss der laufenden Architekturaufgabe Claude neu starten und die Erkennung der regulären Git-Installation bestätigen.
 - Tech-Stack, Architektur und Datenmodell abstimmen.
 - Styleguide gemeinsam festlegen.
 - Dev-/Prod-Trennung und Deployment-Pipeline konkretisieren und später umsetzen.
