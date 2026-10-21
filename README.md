@@ -12,5 +12,6 @@ Vorbereitungsstand vom 21. Oktober 2026. Noch keine Anwendungsimplementierung.
 6. `docs/backlog.md`: Gemeinsames PO-Backlog und nächster Arbeitsabschnitt.
 7. `docs/rollen-und-uebergaben.md`: Zuständigkeiten und Übergaben der sechs Claude-Rollen.
 8. `docs/styleguide-briefing.md`: Vorbereitung der noch offenen visuellen Gestaltung.
+9. `docs/einrichtungsstand.md`: Nachgewiesener Claude-Zugriff, Versionsstand und lokale Werkzeuglücken.
 
-Der lokale Ordner ist die Arbeitskopie. Das private GitHub-Repository https://github.com/jago1698/projektmanagement-software ist erstellt und als origin verbunden. Ein erster Commit und Upload stehen noch aus. Server, Domain, Datenbank und E-Mail-Dienst sind noch nicht eingerichtet. Die sechs lokalen Rollen müssen in der tatsächlichen Claude-Code-Umgebung noch auf Erkennung geprüft werden.
+Der lokale Ordner ist die Arbeitskopie. Das private GitHub-Repository https://github.com/jago1698/projektmanagement-software ist erstellt und als origin verbunden. Der erste lokale Commit ist erstellt; Uploadstatus siehe docs/einrichtungsstand.md. Claude kann die Unterlagen lesen und bestätigt alle sechs geladenen Rollen. Server, Domain, Datenbank, E-Mail-Dienst und Deployment-Pipeline sind noch nicht eingerichtet.

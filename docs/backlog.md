@@ -8,9 +8,9 @@ Status: Offen, In Arbeit, Zur Prüfung, Erledigt. Ein technischer Nachweis und e
 
 | ID | Aufgabe | Status | Abnahmekriterium |
 | --- | --- | --- | --- |
-| V01 | Claude-Arbeitsregeln und sechs Rollen vorbereiten | Zur Prüfung | Dateien vorhanden; Erkennung aller Rollen in Claude Code noch nachweisen |
-| V02 | GitHub-Konto und privates Repository verbinden | In Arbeit | Privates Repository https://github.com/jago1698/projektmanagement-software angelegt und als origin eingetragen; Commit-Identität, Git-Anmeldung und erster hochgeladener Stand noch offen |
-| V03 | Claude mit lokalem Projektordner verbinden | Offen | Claude kann README und Anforderungen lesen und erkannte Rollen benennen |
+| V01 | Claude-Arbeitsregeln und sechs Rollen vorbereiten | Erledigt | Dateien vorhanden; Claude bestätigt alle sechs als geladene aufrufbare Unteragenten; einzelner Probelauf noch nicht erfolgt |
+| V02 | GitHub-Konto und privates Repository verbinden | Erledigt | Privates Repository angelegt, origin verbunden, bestätigte noreply-Identität eingerichtet und erster Commit erfolgreich hochgeladen |
+| V03 | Claude mit lokalem Projektordner verbinden | Erledigt | Benutzer hat Workspace freigegeben; Claude liest die Unterlagen und benennt alle sechs geladenen Rollen |
 | V04 | Architektur und Betriebsrahmen abstimmen | Offen | Begründete Technikauswahl, Systemgrenzen, Datenmodell und Entwicklungsbefehle dokumentiert |
 | V05 | Berechtigungsmodell konkretisieren | Offen | Rechte für alle vier Rollen, Projektgrenzen, Dateien und Freigaben überprüfbar beschrieben |
 | V06 | Styleguide abstimmen | Offen | Navigationsmuster, Farben, Schrift, Dichte und zentrale Komponenten anhand von Ansichten bestätigt |
