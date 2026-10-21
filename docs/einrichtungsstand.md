@@ -21,7 +21,8 @@ Git for Windows wurde über winget (Paket Git.Git) installiert. Installer-Hashpr
 - `C:\Program Files\Git\cmd` ist dauerhaft im Windows-Systemsuchpfad eingetragen.
 - Mit dem aus den Windows-Einstellungen frisch geladenen Suchpfad löst `git` auf diese Installation auf; `git --version` funktioniert.
 - Die neue Installation kann das Projekt öffnen; main war bei der Prüfung mit origin/main synchron.
-- Claude lief während der Installation mit einer Architekturaufgabe weiter. Nach deren Abschluss Claude vollständig neu starten und den Kurzaufruf in einer neuen Sitzung prüfen. Alte Prozesse übernehmen Suchpfadänderungen nicht automatisch.
+- Claude nach Abschluss der Architekturaufgabe vollständig beendet und neu gestartet.
+- Neue Claude-Sitzung „Git-Erkennung nach Neustart prüfen“ bestätigt: Git wird ohne vollständige Pfadangabe gefunden, Version 2.55.0.windows.5, Installationspfad C:\Program Files\Git\cmd\git.exe. Die Einrichtungslücke ist damit auch in Claude behoben.
 
 Der zuvor genutzte Codex-interne Git-Pfad ist für die reguläre Entwicklung nicht mehr vorgesehen. Es wurden keine globalen Git-Autorenangaben geändert; die bestätigte Identität bleibt projektbezogen.
 
@@ -29,7 +30,7 @@ Claudes Einrichtungsbericht wurde teilweise vor dem ersten Commit erstellt. Sein
 
 ## Noch offen
 
-- Nach Abschluss der laufenden Architekturaufgabe Claude neu starten und die Erkennung der regulären Git-Installation bestätigen.
+- Vier Architekturentwürfe sind lokal gespeichert und fachlich noch nicht freigegeben: entwurf-vorbereitung.md, entwurf-technik-und-betrieb.md, entwurf-datenmodell-und-rechte.md und entwurf-erster-entwicklungsabschnitt.md. Deren ursprüngliche Bestandsaufnahme entstand vor der Git-Installation und ist hinsichtlich Git überholt; maßgeblich ist dieser Einrichtungsstand.
 - Tech-Stack, Architektur und Datenmodell abstimmen.
 - Styleguide gemeinsam festlegen.
 - Dev-/Prod-Trennung und Deployment-Pipeline konkretisieren und später umsetzen.

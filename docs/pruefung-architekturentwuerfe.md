@@ -1,0 +1,26 @@
+# Prüfung der Architekturentwürfe
+
+Stand 21. Oktober 2026. Beraterprüfung, keine technische oder fachliche Freigabe. Die vier Entwurfsdateien bleiben als ursprünglicher Vorschlag erhalten. Vor Umsetzung sind folgende Punkte zu bereinigen.
+
+## Geeignete Grundlagen
+
+Eine gemeinsam entwickelte Anwendung mit getrennten Modulen, relationaler Datenbank, serverseitigen Projektberechtigungen, nachvollziehbaren Planständen und gespeicherten Dokumentversionen passt zum beschriebenen Umfang. Django und PostgreSQL sind dafür plausible Kandidaten. Die konkrete Technikentscheidung und Paketversionen bleiben offen.
+
+## Erforderliche Nacharbeit
+
+1. **Einrichtung nicht erneut aufrollen.** Git for Windows ist installiert und in einer neu gestarteten Claude-Sitzung nachgewiesen. Verweise auf eine noch offene Git-Lücke sind überholt. Es ist nicht notwendig, das Repository allein deshalb nach WSL zu verlagern.
+2. **Desktop-Arbeitsweise erhalten.** Der Benutzer möchte künftig direkt in Claude Desktop arbeiten. Vor einem Wechsel in eine Linux-Entwicklungsumgebung müssen der konkrete Desktop-Zugang und die Werkzeugkette geprüft werden. Die aktuelle Claude-Dokumentation beschreibt WSL-Sitzungen ausdrücklich. Es ist keine generelle Unverträglichkeit anzunehmen. Quelle: https://code.claude.com/docs/en/desktop (Abschnitt Environment configuration).
+3. **Docker-Home-Aussage präzisieren.** Die Herstellerseite nennt ausdrücklich Linux-Container für Windows Home und Education; ihre Anforderungen listen zugleich bestimmte Windows-Editionen auf. Die Eignung der konkreten Windows-/WSL-Version prüfen, statt allein aus der Editionsliste einen Ausschluss oder aus dem allgemeinen Hinweis eine vollständig geprüfte lokale Einrichtung abzuleiten. Quelle: https://docs.docker.com/desktop/setup/install/windows-install/.
+4. **Styleguide vor Oberfläche.** CLAUDE.md verlangt die Abstimmung vor Oberflächenimplementierung. Der Vorschlag für eine absichtlich ungestaltete erste Oberfläche widerspricht dem. Zuerst Navigations- und Gestaltungsproben abstimmen. Technische Datenmodell- und Rechtevorbereitung kann unabhängig davon weitergehen.
+5. **Bedienbarer Prod-Prozess.** Manuelle Freigabe darf nicht automatisch einen regelmäßig vom Benutzer auszuführenden SSH-Befehl bedeuten. Einen manuell gestarteten GitHub-Workflow als Alternative bewerten. GitHub unterstützt workflow_dispatch; das ist jedoch keine unabhängig abgesicherte Required-reviewer-Freigabe. Rechte, Secrets und erlaubte Versionen müssen im Vorschlag ausdrücklich erläutert werden. Quellen: https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow und https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments.
+6. **Rollenmodell konsistent machen.** Eine einzige globale Rolle, projektbezogene Rollen und die Ausnahme Admin sind im Entwurf nicht vollständig konsistent. Mehrere Projektrollen pro Person sind erforderlich. Projektanlage-Befugnis und Projektmitgliedschaft getrennt beschreiben. Managementzugriff bleibt auf Dashboard/Reporting zugeordneter Projekte begrenzt; kein pauschaler Zugriff auf alle Uploads ableiten.
+7. **Persönliche Aufgaben vollständig modellieren.** Ein expliziter Eigentümer und Regeln zu Zuweisung, Anhängen und Sichtbarkeit persönlicher Aufgaben fehlen. Projektlose Dateien dürfen nicht allein wegen fehlender Projektzuordnung zugänglich werden. Kommentare, Stakeholder und Steckbriefdaten im Gesamtmodell zumindest als Erweiterungsbedarf benennen.
+8. **Projekttermine ebenfalls historisieren.** Das Modell darf Plan, Prognose und Ist nicht nur für Meilensteine abdecken. Projektanfang und Projektende sowie Änderungen am Gesamtzeitraum benötigen dieselbe nachvollziehbare Unterscheidung. Ein Meilenstein ist ein Ereignis, ein geplanter Zeitraum gehört zu einem Vorgang; diese Begriffe im Modell prüfen.
+9. **Reminder nicht überversprechen.** Ein eindeutiger Datenbankeintrag verhindert mehrere Jobs für denselben Zweck, garantiert aber allein keine einmalige E-Mail-Zustellung bei SMTP-Timeouts oder Prozessabbruch. Fehlerzustände, Wiederholungen und Sichtbarkeit unklarer Zustellungen beschreiben. Den Benutzer nicht pauschal zwischen verlorenen oder doppelten Mails wählen lassen. Später Provider-Idempotenz beziehungsweise Versandabgleich prüfen.
+10. **Phasenänderungen nicht als garantiert umbaufrei darstellen.** Das Phasenmodell bleibt offen. Erweiterungspunkte planen, aber Auswirkungen späterer Fachentscheidungen nicht vorweg ausschließen.
+
+## Priorisierte Entscheidungsvorlage
+
+Zuerst eine überschaubare Grundrichtung entscheiden: Django mit PostgreSQL als Hauptkandidat, HTML/CSS-Oberfläche mit gezielten interaktiven Komponenten und Linux-Container für Betrieb. Eine professionelle Aufgabenoberfläche ist damit grundsätzlich möglich, aber Board-, Kalender- und Zeitplaninteraktion muss im Gestaltungs- und Technikprototyp nachgewiesen werden. Paketversionen und konkrete lokale Containerumgebung erst danach festlegen.
+
+Die bestehenden sieben Entscheidungspunkte nicht pauschal als Paket übernehmen. Produktregeln, Entwicklungsumgebung und späteres Hosting sind getrennte Entscheidungen. Der Benutzer soll Empfehlungen mit ihren praktischen Konsequenzen beurteilen können.

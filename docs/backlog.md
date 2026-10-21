@@ -8,6 +8,7 @@ Status: Offen, In Arbeit, Zur Prüfung, Erledigt. Ein technischer Nachweis und e
 
 | ID | Aufgabe | Status | Abnahmekriterium |
 | --- | --- | --- | --- |
+| V08 | Zentrale Projektleitung und Übergabe an Claude | In Arbeit | Projektleitungsmodus, sieben geladene Rollen und Arbeitsstand nachgewiesen; technische Grundrichtung, Entwicklungsumgebung und erster vollständiger Arbeitsablauf vor endgültiger Übergabe noch offen |
 | V01 | Claude-Arbeitsregeln und sechs Rollen vorbereiten | Erledigt | Dateien vorhanden; Claude bestätigt alle sechs als geladene aufrufbare Unteragenten; einzelner Probelauf noch nicht erfolgt |
 | V02 | GitHub-Konto und privates Repository verbinden | Erledigt | Privates Repository angelegt, origin verbunden, bestätigte noreply-Identität eingerichtet und erster Commit erfolgreich hochgeladen |
 | V03 | Claude mit lokalem Projektordner verbinden | Erledigt | Benutzer hat Workspace freigegeben; Claude liest die Unterlagen und benennt alle sechs geladenen Rollen |

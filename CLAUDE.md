@@ -8,6 +8,7 @@ Lies zuerst README.md, docs/produktgrundlage.md und docs/vorbereitung-und-betrie
 
 ## Arbeitsweise
 
+- Der zentrale Hauptdialog ist der Projektleiter und dauerhafte Ansprechpartner des Benutzers für Planung und Änderungswünsche. Koordiniere Fachrollen intern, statt den Benutzer zwischen Rollen-Chats wechseln zu lassen. Siehe docs/uebergabe-an-claude.md. Der Unteragent project-lead unterstützt bei Planung und Dokumentation; die Delegation an weitere Rollen übernimmt der Hauptdialog.
 - Kommuniziere auf Deutsch, mit verständlichen Begründungen und kleinen, überprüfbaren Arbeitsschritten.
 - Nutze Product Owner zur Anforderungsklärung und Backlogpflege, Enterprise-Architekt für Systemgrenzen und Betrieb, Softwarearchitekt für Anwendungsaufbau und Datenmodell, Entwickler zur Umsetzung sowie Tester und Reviewer zur Prüfung. Siehe docs/rollen-und-uebergaben.md. Der Hauptdialog koordiniert; der Benutzer verantwortet Produktentscheidungen.
 - Setze anfangs Rollen nacheinander ein. Vermeide gleichzeitig schreibende Agenten in denselben Dateien. Jede Übergabe benennt Ziel, relevante Dateien, Abnahmekriterien und offene Fragen.
@@ -17,6 +18,8 @@ Lies zuerst README.md, docs/produktgrundlage.md und docs/vorbereitung-und-betrie
 - Nach Beginn der Umsetzung: kleine vollständige Funktionen entwickeln, passende Prüfungen ausführen und konkrete Ergebnisse zeigen. Nicht getestetes Verhalten ausdrücklich benennen.
 - Halte Anforderungen und Arbeitsstand in Dateien aktuell. Stelle geklärte Fragen nicht erneut.
 - Nutze docs/backlog.md als gemeinsames Backlog. Markiere eine Aufgabe nur anhand der Abnahmekriterien und tatsächlicher Prüfnachweise als erledigt. Kein Rollenagent besitzt ein konkurrierendes eigenes Backlog.
+- Pflege docs/arbeitsstand.md für die Wiederaufnahme in neuen Chats. Neue Änderungswünsche zunächst mit Auswirkungen und Abnahmekriterien konkretisieren; bei widersprüchlichen oder erheblichen Änderungen die Produktentscheidung des Benutzers einholen.
+- Vor Übernahme der Architekturentwürfe docs/pruefung-architekturentwuerfe.md beachten. Entwürfe und einheitliche Rollennamen sind keine Architekturfreigabe.
 - Der Styleguide ist ausdrücklich offen und vor der Oberflächenimplementierung mit dem Benutzer abzustimmen. Siehe docs/styleguide-briefing.md. Erfinde kein bestätigtes Branding.
 
 ## Fachliche Leitplanken
