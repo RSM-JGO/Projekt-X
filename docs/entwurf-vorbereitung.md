@@ -1,6 +1,8 @@
 # ENTWURF: Vorbereitungsergebnis und Entscheidungsvorlage
 
 Status: **Entwurf zur gemeinsamen Entscheidung**. Nichts davon ist beschlossen. Stand: 21. Oktober 2026.
+
+> **Hinweis Nacharbeit (21. Oktober 2026):** Ursprünglicher Vorschlag, teilweise überholt. Maßgeblich bei Widersprüchen ist `docs/entwurf-nacharbeit.md` (Revision 2, ebenfalls Entwurf, nicht freigegeben).
 Grundlage: Auftrag in `docs/claude-startauftrag.md`. Erarbeitet nacheinander von Product Owner, Enterprise-Architekt und Softwarearchitekt; zusammengeführt und technisch nachgeprüft im Hauptdialog.
 
 Bestehende Anforderungsdokumente (`produktgrundlage.md`, `backlog.md`, `vorbereitung-und-betrieb.md`, `styleguide-briefing.md`) wurden **nicht verändert**. Wo dieser Entwurf etwas vorschlägt, das dort offen ist, ist es als Vorschlag gekennzeichnet.

@@ -1,6 +1,6 @@
 # Claude Rollen und Übergaben
 
-Die sieben Rollendateien liegen in .claude/agents/. Alle sieben wurden in der neuen Claude-Sitzung „Projektleitung und Rollenüberblick“ als tatsächlich geladene Unteragenten bestätigt. Drei beratende Rollen wurden bereits ausgeführt. Der Hauptdialog hat den Projektleitungsmodus übernommen. Es sind Entwicklungsrollen, keine Benutzerrollen der späteren Plattform. Es werden keine separaten Claude-Konten benötigt.
+Die acht Rollendateien liegen in .claude/agents/. Die bisherigen sieben wurden in der Claude-Sitzung „Projektleitung und Rollenüberblick“ als tatsächlich geladene Unteragenten bestätigt. release-manager wurde anschließend ergänzt und am 21.10.2026 ebenfalls als geladen erkannt und ausgeführt. Drei beratende Rollen wurden bereits ausgeführt. Der Hauptdialog hat den Projektleitungsmodus übernommen. Es sind Entwicklungsrollen, keine Benutzerrollen der späteren Plattform. Es werden keine separaten Claude-Konten benötigt.
 
 ## Zuständigkeiten
 
@@ -13,6 +13,7 @@ Die sieben Rollendateien liegen in .claude/agents/. Alle sieben wurden in der ne
 | Entwickler | Einen beauftragten Backlogeintrag umsetzen | Kleine überprüfbare Änderung mit Prüfnachweisen |
 | Tester | Verhalten gegen Abnahmekriterien prüfen | Testergebnisse und reproduzierbare Fehler |
 | Reviewer | Änderungen unabhängig auf konkrete Fehler prüfen | Priorisierte Befunde mit Fundstellen und Auswirkungen |
+| Releasemanager | Versionen, Release Notes, Prüfnachweise und Dev-/Prod-Übergaben koordinieren | Begründete Release-Empfehlung und dokumentierter tatsächlicher Bereitstellungsstand |
 
 Der Hauptdialog übernimmt die Projektleitung, delegiert und überträgt Ergebnisse der beratenden Rollen in Dateien. Product Owner, Architekten und Reviewer haben nur lesende Werkzeuge; sie bearbeiten das Backlog nicht selbst. project-lead kann Projektunterlagen pflegen, aber keine weiteren Agenten aufrufen. Der Entwickler kann nach Auftrag schreiben; der Tester kann Testbefehle ausführen. Werkzeugzugriff allein ist keine Erlaubnis für produktive Änderungen.
 

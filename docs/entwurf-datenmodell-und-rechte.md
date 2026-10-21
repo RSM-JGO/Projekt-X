@@ -1,6 +1,8 @@
 # ENTWURF: Module, Datenmodell und Rollenrechte
 
 Status: **Entwurf, nicht beschlossen**. Stand: 21. Oktober 2026. Übersicht und Entscheidungsvorlage: `docs/entwurf-vorbereitung.md`.
+
+> **Hinweis Nacharbeit (21. Oktober 2026):** Ursprünglicher Vorschlag, teilweise überholt. Maßgeblich bei Widersprüchen ist `docs/entwurf-nacharbeit.md` (Revision 2, ebenfalls Entwurf, nicht freigegeben).
 Annahmen aus der Entscheidungsvorlage (B1–B6) gelten, bis du entschieden hast.
 
 ## 1. Module der Anwendung

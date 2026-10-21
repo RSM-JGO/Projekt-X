@@ -2,7 +2,7 @@
 
 Wir bereiten eine professionelle IT-Projektmanagementplattform vor. Beginne mit Vorbereitung und Planung; programmiere noch keine Anwendung und installiere noch keine Frameworks.
 
-Lies CLAUDE.md, README.md, docs/arbeitsstand.md, docs/produktgrundlage.md, docs/vorbereitung-und-betrieb.md, docs/backlog.md, docs/rollen-und-uebergaben.md und docs/styleguide-briefing.md. Prüfe, ob alle sieben Rollen in .claude/agents/ erkannt werden: project-lead, product-owner, enterprise-architect, architect, developer, tester und reviewer. Übernimm die Projektleitung im Hauptdialog. Nutze Product Owner, Enterprise-Architekt und Softwarearchitekt bedarfsgerecht nacheinander. Falls Unteragenten nicht verfügbar sind, benenne das und bearbeite die Rollen nachvollziehbar nacheinander im Hauptdialog. Bestehende Architekturentwürfe anhand docs/pruefung-architekturentwuerfe.md nacharbeiten, statt die gesamte Vorbereitung zu wiederholen.
+Lies CLAUDE.md, README.md, docs/arbeitsstand.md, docs/produktgrundlage.md, docs/vorbereitung-und-betrieb.md, docs/backlog.md, docs/rollen-und-uebergaben.md und docs/styleguide-briefing.md. Prüfe, ob alle acht Rollen in .claude/agents/ erkannt werden: project-lead, product-owner, enterprise-architect, architect, developer, tester, reviewer und release-manager. Übernimm die Projektleitung im Hauptdialog. Nutze Product Owner, Enterprise-Architekt und Softwarearchitekt bedarfsgerecht nacheinander sowie Releasemanager für Pipeline- und Releasefragen. Falls Unteragenten nicht verfügbar sind, benenne das und bearbeite die Rollen nachvollziehbar nacheinander im Hauptdialog. Bestehende Architekturentwürfe anhand docs/pruefung-architekturentwuerfe.md nacharbeiten, statt die gesamte Vorbereitung zu wiederholen.
 
 Erstelle anschließend:
 

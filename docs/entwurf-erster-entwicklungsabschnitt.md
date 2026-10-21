@@ -2,6 +2,8 @@
 
 Status: **Entwurf, nicht beauftragt**. Stand: 21. Oktober 2026. Voraussetzung: Entscheidungen E1 bis E7 in `docs/entwurf-vorbereitung.md` und eine eingerichtete lokale Entwicklungsumgebung.
 
+> **Hinweis Nacharbeit (21. Oktober 2026):** Ursprünglicher Vorschlag, teilweise überholt. Maßgeblich bei Widersprüchen ist `docs/entwurf-nacharbeit.md` (Revision 2, ebenfalls Entwurf, nicht freigegeben).
+
 ## Titel
 
 „Anmeldung, Projektgrenzen und gemeinsame Aufgaben“

@@ -4,7 +4,7 @@
 
 Der Hauptdialog übernimmt die Projektleitung. Der Benutzer beschreibt hier Ziele, Probleme und Änderungswünsche in normaler Sprache. Die Projektleitung klärt Auswirkungen, pflegt den gemeinsamen Arbeitsstand und zieht passende Fachrollen hinzu. Der Benutzer muss nicht mehrere Rollen-Chats führen.
 
-Sieben Rollen: project-lead, product-owner, enterprise-architect, architect, developer, tester, reviewer. Die delegierte Projektleiterrolle unterstützt die Planung; Agentenaufrufe koordiniert der Hauptdialog. Ein Rollenname alleine führt keine Prüfung aus. Ergebnisse müssen anhand der tatsächlichen Arbeit und Nachweise bewertet werden.
+Acht Rollen: project-lead, product-owner, enterprise-architect, architect, developer, tester, reviewer, release-manager. Die delegierte Projektleiterrolle unterstützt die Planung; Agentenaufrufe koordiniert der Hauptdialog. Der Releasemanager koordiniert Versionen und Bereitstellungen gemäß docs/releaseprozess.md. Ein Rollenname alleine führt keine Prüfung aus. Ergebnisse müssen anhand der tatsächlichen Arbeit und Nachweise bewertet werden.
 
 ## Umgang mit Änderungswünschen
 
@@ -17,7 +17,7 @@ Sieben Rollen: project-lead, product-owner, enterprise-architect, architect, dev
 
 ## Wann die Übergabe vollständig ist
 
-- Alle sieben Rollen sind erkannt; der Hauptdialog arbeitet als Projektleitung.
+- Alle acht Rollen sind erkannt; der Hauptdialog arbeitet als Projektleitung.
 - Arbeitsstand, Backlog, Anforderungen und Entscheidungen sind auch ohne alte Chat-Historie nutzbar.
 - Technische Grundrichtung und lokale Entwicklung sind abgestimmt und durch einen lauffähigen Start nachgewiesen.
 - Styleguide und erster Entwicklungsabschnitt sind konkret genug zur Umsetzung.
@@ -28,4 +28,4 @@ Die Übergabe ist derzeit vorbereitet, noch nicht vollständig abgeschlossen. Co
 
 ## Startnachricht für einen neuen Claude-Chat
 
-Übernimm die Projektleitung für meine IT-Projektmanagementplattform. Lies CLAUDE.md, README.md, docs/arbeitsstand.md, docs/backlog.md und docs/rollen-und-uebergaben.md. Du bist mein zentraler Ansprechpartner für Änderungswünsche und koordinierst die passenden Fachrollen intern. Prüfe, ob project-lead und die sechs weiteren Rollen geladen sind. Berücksichtige vor der nächsten Architekturentscheidung docs/pruefung-architekturentwuerfe.md. Setze beim dokumentierten nächsten Schritt fort; behandle Entwürfe nicht als Freigaben und frage bereits geklärte Anforderungen nicht erneut ab.
+Übernimm die Projektleitung für meine IT-Projektmanagementplattform. Lies CLAUDE.md, README.md, docs/arbeitsstand.md, docs/backlog.md und docs/rollen-und-uebergaben.md. Du bist mein zentraler Ansprechpartner für Änderungswünsche und koordinierst die passenden acht Fachrollen inklusive release-manager intern. Prüfe neu hinzugekommene Rollen auf Erkennung. Berücksichtige vor der nächsten Architekturentscheidung docs/pruefung-architekturentwuerfe.md. Setze beim dokumentierten nächsten Schritt fort; behandle Entwürfe nicht als Freigaben und frage bereits geklärte Anforderungen nicht erneut ab.

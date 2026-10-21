@@ -1,6 +1,8 @@
 # ENTWURF: Technik, Umgebungen und Deployment
 
 Status: **Entwurf, nicht beschlossen**. Stand: 21. Oktober 2026. Übersicht und Entscheidungsvorlage: `docs/entwurf-vorbereitung.md`.
+
+> **Hinweis Nacharbeit (21. Oktober 2026):** Ursprünglicher Vorschlag, teilweise überholt. Maßgeblich bei Widersprüchen ist `docs/entwurf-nacharbeit.md` (Revision 2, ebenfalls Entwurf, nicht freigegeben).
 Kennzeichnung: **[geprüft]** = am 21.10.2026 in offizieller Dokumentation nachgesehen (Quellen im Prüfprotokoll der Übersicht); **[ungeprüft]** = Annahme, vor Festlegung prüfen.
 
 ## 1. Technologievorschlag
