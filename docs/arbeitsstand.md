@@ -19,15 +19,20 @@ Der Benutzer soll die Entwicklung nach abgeschlossener Einrichtung direkt in Cla
 
 ## Nächster Auftrag
 
-1. Benutzerentscheidung zu T1 (technische Grundrichtung) und R (Reihenfolge V06 parallel zu V07a, danach V07b) aus docs/entwurf-nacharbeit.md einholen und dann in docs/decisions/ festhalten.
-2. Nach Auftrag: die lesenden Prüfschritte zur lokalen Containerumgebung (Abschnitt A) ausführen, danach T2 entscheiden. Keine Installation ohne gesonderte Freigabe.
-3. Styleguide-Gestaltungsproben (V06) vorbereiten; Produktregeln (V05) einzeln klären. Oberfläche erst nach Gestaltungsklärung.
+1. Grundrichtung bestätigt, anschließend explizit auf Windows-Server präzisiert: docs/decisions/001-technische-grundrichtung.md und 002-windows-server.md. Die Linux-/Containeranteile der älteren Entscheidung sind ersetzt. Diese Vorgabe nicht erneut abfragen.
+2. Native Windows-Entwicklung und Betrieb auf virtuellem Windows-Server konkretisieren und praktisch prüfen. Keine WSL- oder Linux-Containerinstallation. PDF-Erzeugung, Dienste, Hintergrundjobs und Pipeline Windows-tauglich ausarbeiten. Installationsfreigaben über die vorhandenen Systemwerkzeuge beachten; keinen Rechnerneustart eigenständig auslösen.
+3. Styleguide-Gestaltungsproben (V06) vorbereiten; Produktregeln (V05) konkretisieren. Oberfläche erst nach Gestaltungsklärung.
+4. Ersten kleinen Ablauf durch Claude implementieren und unabhängig prüfen lassen; danach Übergabekriterien aus docs/uebergabe-an-claude.md nachweisen.
 
 ## Offen
 
-Lesende Rechnerprüfung durch die Beratung bereits ausgeführt: siehe docs/pruefung-entwicklungsrechner.md. WSL ist nicht installiert; die tatsächliche Container-Eignung und ein lauffähiger Start sind noch nicht nachgewiesen. Diese Ergebnisse vor weiteren Prüfungen berücksichtigen.
+Die beantragte Installation von Microsoft.WSL über winget wurde vom Benutzer nicht freigegeben und nicht ausgeführt. Der vorherige direkte WSL-Installationsaufruf schlug ohne Installation fehl. WSL ist nach der Windows-Server-Entscheidung nicht mehr Teil der geplanten Einrichtung.
 
-Technikfreigabe (T1), lokale Containerumgebung (T2), detaillierte Rechte inklusive Administratorrechte in Projektinhalten, Teilen persönlicher Aufgaben, Vorgänge in der ersten Fassung, Phasenmodell, Styleguide, Serveranbieter, Prod-Variante P1 oder P2 und konkrete Pipeline. Noch keine Anwendung implementiert und keine Dev-/Prod-Server eingerichtet.
+Bestätigte Gestaltungsvorgabe: Name Projekt X, moderne Gestaltung, gerne Pastellfarben, helle normale Ansicht und Darkmode. Die konkrete Gestaltung wird zunächst als Vorschau abgestimmt.
+
+Lesende Rechnerprüfung durch die Beratung bereits ausgeführt: siehe docs/pruefung-entwicklungsrechner.md. Windows-Arbeitsplatz und Git funktionieren. Die native Python-/Datenbankumgebung ist noch einzurichten und nachzuweisen.
+
+Native Windows-Entwicklungsumgebung, genaue Windows-Server-Version, Windows-Betriebsaufbau, detaillierte Rechte inklusive Administratorrechte in Projektinhalten, Teilen persönlicher Aufgaben, Vorgänge in der ersten Fassung, Phasenmodell, Styleguide und konkrete Pipeline. Technische Grundrichtung ist bestätigt. Noch keine Anwendung implementiert und keine Dev-/Prod-Instanzen eingerichtet.
 
 ## Wiederaufnahme
 

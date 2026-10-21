@@ -4,6 +4,8 @@
 
 Professionelle IT-Projektmanagementplattform, zunächst für den Eigentümer, später für sein Team auf einem virtuellen Server. Die Programmierung erfolgt mit Claude. Der Benutzer kennt Webseiten sowie etwas HTML/CSS und möchte Entscheidungen verständlich erklärt bekommen.
 
+Verbindliche Plattformvorgabe: Entwicklung auf Windows mit Claude Desktop, späterer Betrieb auf einem virtuellen Windows-Server. Siehe docs/decisions/002-windows-server.md; diese ersetzt die Linux-/Containeranteile älterer Entwürfe. Keine WSL- oder Linux-Containerinstallation einplanen. Windows-taugliche Dienste, PDF-Erzeugung und Deployment prüfen. Produktname: Projekt X. Helle Ansicht und Darkmode sind bestätigt; modern und möglichst mit Pastellakzenten gestalten, konkrete Vorschau noch abstimmen.
+
 Lies zuerst README.md, docs/produktgrundlage.md und docs/vorbereitung-und-betrieb.md. Bestätigte Anforderungen, Vorschläge und offene Entscheidungen sind getrennt zu behandeln. Das Phasenmodell ist ausdrücklich offen. Die bestehende operative Rolloutplattform wird nicht nachgebaut. Keine Implementierung allein aus unverbindlichen Vorschlägen ableiten.
 
 ## Arbeitsweise

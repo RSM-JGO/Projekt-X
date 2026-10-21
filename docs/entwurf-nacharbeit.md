@@ -1,5 +1,7 @@
 # ENTWURF: Nacharbeit der Architekturentwürfe (Revision 2)
 
+Überholt hinsichtlich Betriebssystem und Containerumgebung: Der Benutzer hat anschließend einen virtuellen Windows-Server vorgegeben. Entscheidung docs/decisions/002-windows-server.md hat Vorrang. Linux-/WSL-/Containerlösungen dieses Entwurfs nicht implementieren; Betriebsaufbau für Windows überarbeiten. Fachliche Datenmodellkorrekturen bleiben Vorschläge.
+
 Status: **Entwurf, nicht freigegeben**. Stand: 21. Oktober 2026. Grundlage: die zehn Punkte in `docs/pruefung-architekturentwuerfe.md`.
 
 Die vier ursprünglichen Entwürfe (`entwurf-vorbereitung.md`, `entwurf-technik-und-betrieb.md`, `entwurf-datenmodell-und-rechte.md`, `entwurf-erster-entwicklungsabschnitt.md`) bleiben als ursprünglicher Vorschlag erhalten und tragen nur einen Hinweis auf dieses Dokument. **Wo sich die Aussagen widersprechen, gilt dieses Dokument.** Nicht genannte Teile der Entwürfe gelten unverändert weiter als Entwurf.

@@ -1,5 +1,7 @@
 # Vorbereitung und Betrieb
 
+Aktuelle Vorgabe: Betrieb auf virtuellem Windows-Server und Entwicklung unter Windows, siehe docs/decisions/002-windows-server.md. Die nachfolgenden Linux-/VPS-/Containerbausteine sind ältere Vorschläge und für die Umsetzung ersetzt. Native Windows-Dienste, PDF-Erzeugung und Deployment sind neu auszuarbeiten.
+
 ## Arbeitsstand
 
 Die Produktgrundlage ist vorhanden. Ein lokales Vorbereitungsgerüst mit Claude-Arbeitsregeln und sechs Rollen liegt vor. Das private Repository https://github.com/jago1698/projektmanagement-software ist als origin eingetragen; erster Commit und Upload stehen aus. In Claude Code ist der lokale Projektordner ausgewählt und vom Benutzer freigegeben; das Lesen der Unterlagen und die Erkennung der Rollen müssen noch geprüft werden. Framework, Entwicklungswerkzeuge, Architektur und Server sind noch nicht abschließend festgelegt. Es gibt noch keine lauffähige Anwendung.

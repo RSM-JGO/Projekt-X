@@ -8,8 +8,10 @@ Dieses Dokument hält die bisher abgestimmten Anforderungen fest. Vorschläge un
 
 - Zentrale Plattform für die operative Arbeit von IT-Projektmanagern sowie Planung und Managementreporting über mehrere Projekte.
 - Zunächst persönliche Nutzung, perspektivisch Teamnutzung auf einem virtuellen Server.
+- Produktname Projekt X. Der virtuelle Server soll ausdrücklich Windows verwenden; auch der Entwicklungsrechner bleibt Windows. Linux-/Containerannahmen älterer Entwürfe sind ersetzt.
 - Professionelle Webanwendung mit Frontend, Backend, Datenbank, Dateiablage und Berechtigungsmodell.
 - Dev- und Prod-Umgebungen sowie eine Deployment-Pipeline sollen von Anfang an eingeplant werden; konkrete Ausgestaltung und Infrastruktur noch offen.
+- Sowohl eine helle normale Ansicht als auch ein Darkmode sind vorgesehen; konkrete Gestaltung noch offen.
 - Projekte enthalten regelmäßig einen Rollout. Teilweise wird das gesamte Projektmanagement übernommen.
 - Die operative Rolloutsteuerung erfolgt in einer bestehenden Rolloutplattform. Ihre Detailfunktionen sollen nicht nachgebaut werden.
 - Das bereitgestellte Rollouthandbuch ist eine fachliche Quelle, keine uneingeschränkte Softwarevorgabe. Das allgemeine Phasenmodell ist noch offen; bisherige Phasenvorschläge sind nicht beschlossen.
