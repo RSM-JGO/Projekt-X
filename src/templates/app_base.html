@@ -31,10 +31,10 @@
     <nav class="app-nav" aria-label="Hauptnavigation">
       <ul class="app-nav__list">
         <li>
-          <span class="app-nav__item is-disabled" aria-disabled="true" title="Mein Arbeitsplatz folgt in V07b">
+          <a class="app-nav__item" href="{% url 'tasks:workplace' %}"{% if request.resolver_match.url_name == "workplace" or request.resolver_match.url_name == "personal_create" %} aria-current="page"{% endif %}>
             <svg class="app-nav__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-            <span class="app-nav__label">Mein Arbeitsplatz <span class="app-nav__later">folgt in V07b</span></span>
-          </span>
+            <span class="app-nav__label">Mein Arbeitsplatz</span>
+          </a>
         </li>
         <li>
           <a class="app-nav__item" href="{% url 'projects:list' %}"{% if request.resolver_match.namespace == "projects" %} aria-current="page"{% endif %}>

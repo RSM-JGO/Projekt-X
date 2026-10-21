@@ -1,0 +1,74 @@
+{% extends "app_base.html" %}
+{% load px %}
+{% block title %}{{ task.title }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div class="page-head__text">
+    <p class="breadcrumb">
+      {% if task.project %}<a href="{% url 'projects:list' %}">Projekte</a> / <a href="{% url 'projects:detail' task.project.public_id %}">{{ task.project.name }}</a> / {{ task.bucket.name }}
+      {% else %}<a href="{% url 'tasks:workplace' %}">Mein Arbeitsplatz</a> / Persönliche Aufgabe{% endif %}
+    </p>
+    <h1>{{ task.title }}</h1>
+    <div class="chips">
+      {% include "tasks/_status.html" %}
+      {% if task.is_personal %}<span class="chip tone-neutral">Persönlich · ohne Projekt</span>{% endif %}
+    </div>
+  </div>
+  <div class="page-head__actions">
+    {% if can_edit %}<a class="btn" href="{% url 'tasks:edit' task.public_id %}">Bearbeiten</a>{% endif %}
+    {% if not task.is_done and can_complete %}
+      <form method="post" action="{% url 'tasks:complete' task.public_id %}">{% csrf_token %}<button type="submit" class="btn btn--primary">✓ Abschließen</button></form>
+    {% elif task.is_done and can_reopen %}
+      <form method="post" action="{% url 'tasks:reopen' task.public_id %}">{% csrf_token %}<button type="submit" class="btn">↺ Wiederöffnen</button></form>
+    {% endif %}
+  </div>
+</div>
+
+{% if admin_view %}<p class="note note--admin">Du siehst diese {% if task.is_personal %}persönliche Aufgabe von {{ task.owner.display_name }}{% else %}Aufgabe{% endif %} als Administrator. Änderungen werden als Administratoraktion protokolliert.</p>{% endif %}
+
+<div class="card-grid">
+  <section class="card" aria-labelledby="details-title">
+    <div class="card__head"><h2 id="details-title">Details</h2></div>
+    <dl class="facts">
+      <div><dt>Fälligkeit</dt><dd>{% include "tasks/_due.html" %}</dd></div>
+      {% if task.project %}
+        <div><dt>Bucket</dt><dd>{{ task.bucket.name }}</dd></div>
+        <div><dt>Zuständig</dt><dd>
+          <ul class="people">
+            {% for p in assignees %}<li class="person-inline"><span class="avatar{% if p.pk == user.pk %} is-me{% endif %}" aria-hidden="true">{{ p|initials }}</span><span>{{ p.display_name }}</span></li>
+            {% empty %}<li class="muted">Niemand zugewiesen</li>{% endfor %}
+          </ul>
+        </dd></div>
+      {% else %}
+        <div><dt>Eigentümer</dt><dd>{{ task.owner.display_name }}</dd></div>
+      {% endif %}
+      {% if task.is_done %}<div><dt>Abgeschlossen</dt><dd>von {{ task.completed_by.display_name }} am {{ task.completed_at|date:"d.m.Y, H:i" }} Uhr</dd></div>{% endif %}
+    </dl>
+    {% if task.description %}<p class="description">{{ task.description }}</p>{% endif %}
+  </section>
+
+  <section class="card" aria-labelledby="verlauf-title">
+    <div class="card__head"><h2 id="verlauf-title">Verlauf</h2><span class="card__hint">ältester Eintrag zuerst</span></div>
+    <ol class="timeline">
+      {% for e in events %}
+      <li class="{% if e.kind == kinds.COMPLETED %}is-completed{% elif e.kind == kinds.REOPENED %}is-reopened{% endif %}">
+        {% if e.kind == kinds.CREATED %}Angelegt von {{ e.actor.display_name }}
+        {% elif e.kind == kinds.COMPLETED %}Abgeschlossen von {{ e.actor.display_name }}
+        {% elif e.kind == kinds.REOPENED %}Wiedergeöffnet von {{ e.actor.display_name }}
+        {% elif e.kind == kinds.ASSIGNED %}{{ e.actor.display_name }} hat {{ e.new_values.user }} zugewiesen
+        {% elif e.kind == kinds.UNASSIGNED %}{{ e.actor.display_name }} hat die Zuweisung von {{ e.old_values.user }} entfernt{% if e.new_values.reason %} ({{ e.new_values.reason }}){% endif %}
+        {% else %}Geändert von {{ e.actor.display_name }}
+        {% endif %}
+        am <time>{{ e.created_at|date:"d.m.Y, H:i" }}</time>
+        {% if e.as_admin %}<span class="chip tone-sky">Administratoraktion</span>{% endif %}
+        {% if e.kind == kinds.UPDATED %}
+          <ul class="changes">
+            {% for label, old, new in e.changes %}<li><span class="muted">{{ label }}:</span> {{ old }} → {{ new }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+  </section>
+</div>
+{% endblock %}

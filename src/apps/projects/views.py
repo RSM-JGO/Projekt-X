@@ -11,6 +11,9 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
+from apps.tasks import policies as task_policies
+from apps.tasks import selectors as task_selectors
+
 from . import policies, selectors, services
 from .forms import MemberAddForm, MemberRolesForm, ProjectForm
 
@@ -73,6 +76,9 @@ def project_detail(request, public_id):
             "can_edit": policies.can_edit_project(request.user, project),
             "can_manage_members": policies.can_manage_members(request.user, project),
             "acts_as_admin": policies.acts_as_admin(request.user, project),
+            "board": task_selectors.project_board(project, request.GET.get("filter", "offen")),
+            "can_create_task": task_policies.can_create_project_task(request.user, project),
+            "can_manage_buckets": task_policies.can_manage_buckets(request.user, project),
         },
     )
 

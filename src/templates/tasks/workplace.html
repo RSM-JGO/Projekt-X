@@ -1,0 +1,37 @@
+{% extends "app_base.html" %}
+{% block title %}Mein Arbeitsplatz{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div class="page-head__text">
+    <h1>Mein Arbeitsplatz</h1>
+    <p class="page-head__meta">{{ workplace.open_count }} offene Aufgabe{{ workplace.open_count|pluralize:"n" }} · Stand {{ workplace.today|date:"d.m.Y" }}</p>
+  </div>
+  <div class="page-head__actions"><a class="btn btn--primary" href="{% url 'tasks:personal_create' %}">Persönliche Aufgabe anlegen</a></div>
+</div>
+
+<p class="legend" aria-label="Herkunft der Aufgaben">
+  <span class="chip tone-brand">Mir zugewiesen</span>
+  <span class="chip tone-sky">In meinem geleiteten Projekt</span>
+  <span class="chip tone-neutral">Persönlich</span>
+</p>
+
+{% for group in workplace.groups %}
+<section class="task-group" aria-labelledby="g-{{ group.key }}">
+  <h2 class="task-group__title" id="g-{{ group.key }}">{{ group.title }} <span class="task-group__count">{{ group.rows|length }}</span></h2>
+  {% if group.rows %}
+    <ul class="task-list">{% for row in group.rows %}{% include "tasks/_row.html" %}{% endfor %}</ul>
+  {% else %}
+    <p class="bucket__empty">Keine Aufgaben</p>
+  {% endif %}
+</section>
+{% endfor %}
+
+<section class="task-group task-group--done" aria-labelledby="g-done">
+  <h2 class="task-group__title" id="g-done">Kürzlich erledigt <span class="task-group__count">{{ workplace.done|length }}</span></h2>
+  {% if workplace.done %}
+    <ul class="task-list">{% for row in workplace.done %}{% include "tasks/_row.html" %}{% endfor %}</ul>
+  {% else %}
+    <p class="bucket__empty">In den letzten 14 Tagen nichts erledigt</p>
+  {% endif %}
+</section>
+{% endblock %}

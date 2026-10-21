@@ -103,3 +103,27 @@ def test_zwei_projektleiter_entfernen_sich_gegenseitig(welt):
         ).count()
         == 1
     )
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize("wiederholung", range(3))
+def test_zwei_gleichzeitige_abschluesse_ein_ereignis(aufgaben, wiederholung):
+    """V07b Kriterium 9: genau ein Abschlussereignis bei gleichzeitigen Abschlüssen."""
+    from apps.tasks import services as task_services
+    from apps.tasks.models import Task, TaskEvent, TaskEventKind, TaskStatus
+
+    u, a = aufgaben["users"], aufgaben["a"]
+    task = task_services.create_project_task(
+        actor=u["pl"],
+        project=a,
+        bucket=aufgaben["buckets"]["planung"],
+        title="Gleichzeitig",
+        assignees=[u["pl"], u["ma"]],
+    )
+    ergebnisse = _parallel(
+        lambda: task_services.complete_task(actor=u["ma"], task=task),
+        lambda: task_services.complete_task(actor=u["pl"], task=task),
+    )
+    assert sorted(ergebnisse) == ["abgelehnt", "ok"]
+    assert TaskEvent.objects.filter(task=task, kind=TaskEventKind.COMPLETED).count() == 1
+    assert Task.objects.get(pk=task.pk).status == TaskStatus.ERLEDIGT

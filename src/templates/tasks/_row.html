@@ -1,0 +1,18 @@
+{% with task=row.task overdue=row.overdue is_today=row.is_today %}
+<li>
+  <a class="task-row{% if task.is_done %} is-done{% endif %}" href="{% url 'tasks:detail' task.public_id %}">
+    <span class="state-dot{% if task.is_done %} is-done{% elif overdue %} is-overdue{% endif %}" aria-hidden="true">{% if task.is_done %}✓{% elif overdue %}!{% endif %}</span>
+    <span class="task-row__main">
+      <span class="task-row__title">{{ task.title }}<span class="sr-only">, Status: {{ task.get_status_display }}</span></span>
+      <span class="task-row__meta">
+        <span>{% if task.project %}{{ task.project.name }} · {{ task.bucket.name }}{% else %}Ohne Projekt{% endif %}</span>
+        {% if task.is_done %}<span>Abgeschlossen von {{ task.completed_by.display_name }} am {{ task.completed_at|date:"d.m.Y, H:i" }}</span>{% else %}{% include "tasks/_due.html" %}{% endif %}
+        {% if row.origin == "persoenlich" %}<span class="chip tone-neutral">Persönlich</span>
+        {% elif row.origin == "zugewiesen" %}<span class="chip tone-brand">Mir zugewiesen</span>
+        {% else %}<span class="chip tone-sky">In meinem geleiteten Projekt</span>{% endif %}
+      </span>
+    </span>
+    <span class="task-row__aside">{% if task.project %}{% include "tasks/_people.html" with people=row.assignees %}{% endif %}</span>
+  </a>
+</li>
+{% endwith %}

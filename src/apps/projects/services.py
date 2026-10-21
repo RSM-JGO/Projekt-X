@@ -10,11 +10,14 @@ from django.db import transaction
 from django.utils import timezone
 
 from apps.audit.services import record
+from apps.tasks import services as task_services
 
 from . import policies
 from .models import Project, ProjectMembership, ProjectRole, ProjectRoleAssignment
 
 PROJECT_FIELDS = ("name", "description", "start_date", "end_date")
+
+WRITE_ROLES = {ProjectRole.PROJEKTLEITER, ProjectRole.MITARBEITER}
 
 FEHLER_LETZTER_PL = (
     "Das Projekt braucht mindestens einen aktiven Projektleiter mit aktivem Konto. "
@@ -184,6 +187,11 @@ def change_roles(*, actor, project, membership, roles):
             membership=membership, role=role, assigned_by=actor, assigned_at=now
         )
     _ensure_active_lead(project)
+    if not roles & WRITE_ROLES:
+        # Keine Schreibrolle mehr: Zuweisungen in offenen Aufgaben enden (V07b-Review)
+        task_services.end_assignments_after_role_loss(
+            actor=actor, project=project, user=membership.user, as_admin=as_admin
+        )
     record(
         actor=actor,
         action="membership.roles_changed",
@@ -215,6 +223,9 @@ def remove_member(*, actor, project, membership):
     membership.ended_at = now
     membership.save(update_fields=["ended_at"])
     _ensure_active_lead(project)
+    task_services.end_assignments_after_role_loss(
+        actor=actor, project=project, user=membership.user, as_admin=as_admin
+    )
     record(
         actor=actor,
         action="membership.ended",

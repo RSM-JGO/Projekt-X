@@ -12,7 +12,7 @@ def test_seitenrahmen_mit_logo_umschalter_und_abmelden_per_post(client, welt):
     assert "data-theme-toggle" in html
     assert f'method="post" action="{reverse("accounts:logout")}"' in html
     assert "csrfmiddlewaretoken" in html
-    assert "folgt in V07b" in html
+    assert reverse("tasks:workplace") in html  # Mein Arbeitsplatz ist seit V07b verlinkt
     assert "Designvorschau" not in html
     assert "cdn" not in html.lower()
 

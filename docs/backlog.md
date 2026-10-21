@@ -16,7 +16,20 @@ Status: Offen, In Arbeit, Zur Prüfung, Erledigt. Ein technischer Nachweis und e
 | V04 | Architektur und Betriebsrahmen abstimmen | In Arbeit (T1 bestätigt; Windows-Entwurf Revision 3 in docs/entwurf-windows-betrieb.md; Installationsfreigabe sowie W-B bis W-E offen) | Begründete Technikauswahl, Systemgrenzen, Datenmodell und Entwicklungsbefehle dokumentiert |
 | V05 | Berechtigungsmodell konkretisieren | In Arbeit (vier Grundregeln beschlossen, docs/decisions/003-produktregeln-erster-ablauf.md; Detailmatrix offen) | Rechte für alle vier Rollen, Projektgrenzen, Dateien und Freigaben überprüfbar beschrieben |
 | V06 | Styleguide abstimmen | In Arbeit (Designvorschau unter design/; Gestaltung vom Benutzer grundsätzlich akzeptiert, einfacher Hell/Dunkel-Umschalter umgesetzt; Aufbau, besonders des Arbeitsplatzes, noch zu überarbeiten, vom Benutzer auf später gelegt) | Klickbare lokale Vorschau mit Beispieldaten, Projekt X, modernen Pastellakzenten und Hell/Dunkel; danach Benutzerfeedback und Bestätigung |
-| V07 | Ersten Entwicklungsabschnitt definieren | In Arbeit (beauftragt; V07a vom Benutzer abgenommen (248 Tests grün, Browser- und Reviewprüfung bestanden); V07b in Umsetzung) | Kleiner vollständiger Ablauf mit Abnahmekriterien und geeigneten Prüfungen beauftragt |
+| V07 | Ersten Entwicklungsabschnitt definieren | In Arbeit (beauftragt; Erledigt: V07a und V07b vom Benutzer abgenommen (478 Tests grün, Browser- und Reviewprüfung bestanden)) | Kleiner vollständiger Ablauf mit Abnahmekriterien und geeigneten Prüfungen beauftragt |
+
+## Geplante Reihenfolge (vom Benutzer am 21.10.2026 bestätigt)
+
+1. V07b gemeinsame Aufgaben abschließen und abnehmen.
+2. Arbeitsplatz-Aufbau anhand der echten Version überarbeiten.
+3. Externe Demo-Ansicht: eigene Demo-Instanz, Sicherheitseinstellungen, Tunnel-Anbieter nach Benutzerfreigabe (docs/entwurf-windows-betrieb.md 4a).
+4. Meilensteine und Termine mit Plan, Prognose, Ist und Freigabe.
+5. Aufgaben erweitern: Kommentare, Anhänge, Board, Kalender, Priorität, Status „In Arbeit“, Buckets archivieren (Priorität und In Arbeit vom Benutzer am 21.10.2026 bestätigt).
+6. Management-Übersicht.
+7. Statusbericht und PDF, vorher PDF-Prototyp W-C.
+8. Tägliche Erinnerungsmails.
+
+Nebenbei: GitHub-Upload nur nach Freigabe, CI, später Umzug auf den Server des Arbeitgebers. Jede Etappe: Kriterien, Umsetzung, Prüfung und Review, Benutzerabnahme, Commit.
 
 ## Fachlicher Funktionsvorrat
 

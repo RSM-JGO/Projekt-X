@@ -8,6 +8,9 @@ from django.db import transaction
 
 from apps.projects import services
 from apps.projects.models import Project, ProjectMembership, ProjectRole
+from apps.tasks import services as task_services
+from apps.tasks.models import Bucket, Task
+from apps.tasks.selectors import today
 
 # Beispieldaten: klar gekennzeichnet, nicht zustellbare Domain (.invalid, RFC 2606)
 DEMO_USERS = {
@@ -40,6 +43,16 @@ DEMO_PROJECTS = {
             "ma2": [ProjectRole.MITARBEITER],
             "mgmt": [ProjectRole.MANAGEMENT],
         },
+        "buckets": ["Planung", "Umsetzung", "Abnahme"],
+        # (Titel, Bucket, Fälligkeit in Tagen ab heute oder None, Zuständige, erledigt von)
+        "tasks": [
+            ("Bestandsaufnahme Switches", "Planung", -3, ["ma1"], None),
+            ("Lieferant für Access Points anfragen", "Planung", 0, ["pl", "ma1"], None),
+            ("Testaufbau im Labor", "Umsetzung", 5, ["ma2"], None),
+            ("Verkabelungsplan prüfen", "Umsetzung", 12, ["ma1", "ma2"], None),
+            ("Kick-off durchführen", "Planung", -10, ["pl"], "pl"),
+            ("Abnahmeprotokoll vorbereiten", "Abnahme", None, [], None),
+        ],
     },
     "B": {
         "name": "Beispielprojekt B – Druckerumstellung (Beispiel)",
@@ -47,7 +60,22 @@ DEMO_PROJECTS = {
         "start_date": datetime.date(2026, 10, 1),
         "end_date": datetime.date(2026, 12, 18),
         "members": {"ma1": [ProjectRole.MITARBEITER]},
+        "buckets": ["Vorbereitung", "Rollout"],
+        "tasks": [
+            ("Druckerstandorte erfassen", "Vorbereitung", -1, ["ma1"], None),
+            ("Treiberpaket testen", "Vorbereitung", 3, ["ma1", "pl"], None),
+            ("Pilotstandort umstellen", "Rollout", 14, ["ma1"], None),
+            ("Altgeräte-Liste abstimmen", "Vorbereitung", -5, ["ma1"], "ma1"),
+            ("Rollout-Zeitplan kommunizieren", "Rollout", 7, ["pl"], None),
+            ("Restposten klären", "Rollout", None, [], None),
+        ],
     },
+}
+
+
+DEMO_PERSONAL = {
+    "pl": [("Urlaubsvertretung organisieren (Beispiel)", 2)],
+    "ma1": [("Schulung Netzwerkgrundlagen buchen (Beispiel)", None)],
 }
 
 
@@ -64,7 +92,9 @@ class Command(BaseCommand):
         with transaction.atomic():
             users = {key: self._user(spec, password) for key, spec in DEMO_USERS.items()}
             for spec in DEMO_PROJECTS.values():
-                self._project(spec, users)
+                project = self._project(spec, users)
+                self._tasks(project, spec, users)
+            self._personal(users)
 
         self.stdout.write(
             self.style.SUCCESS(
@@ -106,3 +136,40 @@ class Command(BaseCommand):
             if not active:
                 services.add_member(actor=lead, project=project, user=member, roles=roles)
         return project
+
+    def _tasks(self, project, spec, users):
+        lead = users["pl"]
+        buckets = {}
+        for name in spec["buckets"]:
+            bucket = Bucket.objects.filter(project=project, name=name, is_archived=False).first()
+            buckets[name] = bucket or task_services.create_bucket(
+                actor=lead, project=project, name=name
+            )
+        on = today()
+        for title, bucket_name, offset, assignee_keys, done_by in spec["tasks"]:
+            if Task.objects.filter(project=project, title=title).exists():
+                continue
+            task = task_services.create_project_task(
+                actor=lead,
+                project=project,
+                bucket=buckets[bucket_name],
+                title=title,
+                description="Beispielaufgabe, keine echten Daten.",
+                due_date=None if offset is None else on + datetime.timedelta(days=offset),
+                assignees=[users[k] for k in assignee_keys],
+            )
+            if done_by:
+                task_services.complete_task(actor=users[done_by], task=task)
+
+    def _personal(self, users):
+        on = today()
+        for key, items in DEMO_PERSONAL.items():
+            owner = users[key]
+            for title, offset in items:
+                if Task.objects.filter(owner=owner, title=title).exists():
+                    continue
+                task_services.create_personal_task(
+                    actor=owner,
+                    title=title,
+                    due_date=None if offset is None else on + datetime.timedelta(days=offset),
+                )

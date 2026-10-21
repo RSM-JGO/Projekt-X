@@ -1,0 +1,52 @@
+<section class="section section--spaced" aria-labelledby="aufgaben-title">
+  <div class="toolbar">
+    <h2 id="aufgaben-title">Aufgaben nach Bucket</h2>
+    <div class="toolbar__right">
+      <nav class="segmented" aria-label="Aufgaben filtern">
+        {% for f in board.filters %}
+          <a href="?filter={{ f.key }}#aufgaben-title"{% if f.key == board.filter %} aria-current="true"{% endif %}>{{ f.label }} <span class="segmented__count">({{ f.count }})</span></a>
+        {% endfor %}
+      </nav>
+      {% if can_manage_buckets %}<a class="btn btn--small" href="{% url 'tasks:buckets' project.public_id %}">Buckets verwalten</a>{% endif %}
+      {% if can_create_task %}<a class="btn btn--small btn--primary" href="{% url 'tasks:create' project.public_id %}">Aufgabe anlegen</a>{% endif %}
+    </div>
+  </div>
+
+  {% if not board.columns %}
+    <div class="empty-state">
+      <span class="empty-state__icon" aria-hidden="true">+</span>
+      <h3>Noch keine Buckets</h3>
+      <p class="muted">{% if can_manage_buckets %}Lege zuerst Buckets an, zum Beispiel „Planung“ und „Umsetzung“.{% else %}Die Projektleitung legt die Buckets an.{% endif %}</p>
+      {% if can_manage_buckets %}<a class="btn btn--primary" href="{% url 'tasks:buckets' project.public_id %}">Buckets anlegen</a>{% endif %}
+    </div>
+  {% elif not board.visible_count %}
+    <div class="empty-state">
+      <span class="empty-state__icon" aria-hidden="true">∅</span>
+      <h3>Keine {% if board.filter == "offen" %}offenen{% elif board.filter == "erledigt" %}erledigten{% endif %} Aufgaben</h3>
+      {% if board.filter != "alle" %}<a class="btn" href="?filter=alle#aufgaben-title">Alle Aufgaben anzeigen</a>{% endif %}
+    </div>
+  {% else %}
+    <div class="board">
+      {% for col in board.columns %}
+      <section class="bucket" aria-label="Bucket {{ col.bucket.name }}">
+        <div class="bucket__head"><h3>{{ col.bucket.name }}</h3><span class="bucket__count">{{ col.tasks|length }} Aufgabe{{ col.tasks|length|pluralize:"n" }}</span></div>
+        {% if col.tasks %}
+          <ul class="task-list">
+            {% for card in col.tasks %}{% with task=card.task overdue=card.overdue is_today=card.is_today %}
+            <li>
+              <a class="task-card{% if task.is_done %} is-done{% endif %}" href="{% url 'tasks:detail' task.public_id %}">
+                <span class="task-card__title"><span class="state-dot{% if task.is_done %} is-done{% elif overdue %} is-overdue{% endif %}" aria-hidden="true">{% if task.is_done %}✓{% elif overdue %}!{% endif %}</span><span>{{ task.title }}</span></span>
+                <span class="task-card__meta">{% include "tasks/_due.html" %}</span>
+                <span class="task-card__foot">{% include "tasks/_people.html" with people=card.assignees %}{% include "tasks/_status.html" %}</span>
+              </a>
+            </li>
+            {% endwith %}{% endfor %}
+          </ul>
+        {% else %}
+          <p class="bucket__empty">Keine Aufgaben in diesem Filter</p>
+        {% endif %}
+      </section>
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>

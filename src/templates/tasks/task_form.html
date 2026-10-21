@@ -1,0 +1,43 @@
+{% extends "app_base.html" %}
+{% block title %}{% if task %}Aufgabe bearbeiten{% elif project %}Aufgabe anlegen{% else %}Persönliche Aufgabe anlegen{% endif %}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div class="page-head__text">
+    <p class="breadcrumb">
+      {% if project %}<a href="{% url 'projects:list' %}">Projekte</a> / <a href="{% url 'projects:detail' project.public_id %}">{{ project.name }}</a>
+      {% else %}<a href="{% url 'tasks:workplace' %}">Mein Arbeitsplatz</a>{% endif %}
+      {% if task %} / <a href="{% url 'tasks:detail' task.public_id %}">{{ task.title }}</a>{% endif %}
+    </p>
+    <h1>{% if task %}Aufgabe bearbeiten{% elif project %}Aufgabe anlegen{% else %}Persönliche Aufgabe anlegen{% endif %}</h1>
+    {% if not project %}<p class="page-head__meta">Persönliche Aufgaben siehst nur du (und der Administrator). Sie lassen sich nicht anderen zuweisen.</p>{% endif %}
+  </div>
+</div>
+
+{% if acts_as_admin %}<p class="note note--admin">Du handelst als Administrator. Die Änderung wird als Administratoraktion protokolliert.</p>{% endif %}
+
+<section class="card">
+  <form class="form" method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+    {{ form.version }}
+    {% include "partials/field.html" with field=form.title %}
+    {% include "partials/field.html" with field=form.description %}
+    <div class="form__row--split">
+      {% include "partials/field.html" with field=form.due_date %}
+      {% if form.bucket %}{% include "partials/field.html" with field=form.bucket %}{% endif %}
+    </div>
+    {% if form.assignees %}{% include "partials/field.html" with field=form.assignees %}
+    {% elif fixed_assignees is not None %}
+    <div class="form__row">
+      <span class="form__label">Zuständig</span>
+      <p>{% for p in fixed_assignees %}{{ p.display_name }}{% if not forloop.last %}, {% endif %}{% empty %}<span class="muted">Niemand zugewiesen</span>{% endfor %}</p>
+      <span class="helptext">Zuständige ändern nur Projektleiter und Administrator.</span>
+    </div>
+    {% endif %}
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">{% if task %}Speichern{% else %}Anlegen{% endif %}</button>
+      <a class="btn btn--ghost" href="{% if task %}{% url 'tasks:detail' task.public_id %}{% elif project %}{% url 'projects:detail' project.public_id %}{% else %}{% url 'tasks:workplace' %}{% endif %}">Abbrechen</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

@@ -1,6 +1,6 @@
 # Auftrag: Erster echter Ablauf (V07)
 
-Status: Vom Benutzer am 21.10.2026 beauftragt. **V07a vom Benutzer am 21.10.2026 abgenommen** (inkl. Entscheidung 004). V07b in Umsetzung.
+Status: Vom Benutzer am 21.10.2026 beauftragt. **V07a vom Benutzer am 21.10.2026 abgenommen** (inkl. Entscheidung 004). **V07b vom Benutzer am 21.10.2026 abgenommen** („Das passt … mach erstmal weiter“). Zusatzregel nach Empfehlung des Projektleiters: Zuständige ändern nur Projektleiter und Administrator.
 
 **Grundlagen:**
 - `docs/decisions/001` bis `003`;

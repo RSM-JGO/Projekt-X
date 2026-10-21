@@ -1,0 +1,57 @@
+{% extends "app_base.html" %}
+{% block title %}Buckets verwalten{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div class="page-head__text">
+    <p class="breadcrumb"><a href="{% url 'projects:list' %}">Projekte</a> / <a href="{% url 'projects:detail' project.public_id %}">{{ project.name }}</a></p>
+    <h1>Buckets verwalten</h1>
+    <p class="page-head__meta">Die Reihenfolge entspricht den Spalten des Aufgabenboards.</p>
+  </div>
+</div>
+
+{% if acts_as_admin %}<p class="note note--admin">Du handelst als Administrator. Die Änderung wird protokolliert.</p>{% endif %}
+
+<section class="card">
+  {% if buckets %}
+  <div class="table-wrap table-wrap--cards">
+    <table class="table table--cards">
+      <caption class="sr-only">Buckets des Projekts</caption>
+      <thead><tr><th scope="col">Name</th><th scope="col"><span class="sr-only">Aktionen</span></th></tr></thead>
+      <tbody>
+        {% for b in buckets %}
+        <tr>
+          <td data-label="Name">
+            <form class="inline-form" method="post" action="{% url 'tasks:bucket_update' project.public_id b.pk %}">
+              {% csrf_token %}
+              <label class="sr-only" for="bucket-{{ b.pk }}">Name von {{ b.name }}</label>
+              <input id="bucket-{{ b.pk }}" type="text" name="name" value="{{ b.name }}" maxlength="100" required>
+              <button type="submit" class="btn btn--small">Umbenennen</button>
+            </form>
+          </td>
+          <td>
+            <form class="table__actions" method="post" action="{% url 'tasks:bucket_update' project.public_id b.pk %}">
+              {% csrf_token %}
+              <button type="submit" name="move" value="up" class="btn btn--small"{% if forloop.first %} disabled{% endif %} aria-label="{{ b.name }} nach vorne">← nach vorne</button>
+              <button type="submit" name="move" value="down" class="btn btn--small"{% if forloop.last %} disabled{% endif %} aria-label="{{ b.name }} nach hinten">nach hinten →</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="muted">Noch keine Buckets.</p>
+  {% endif %}
+
+  <form class="form form--spaced" method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+    {% include "partials/field.html" with field=form.name %}
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">Bucket anlegen</button>
+      <a class="btn btn--ghost" href="{% url 'projects:detail' project.public_id %}">Zurück zum Projekt</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

@@ -44,7 +44,17 @@ Der Benutzer soll die Entwicklung nach abgeschlossener Einrichtung direkt in Cla
    - **Nicht geprüft:** /admin im Browser; Protokolleinträge durch create_admin/createsuperuser fehlen; Prod-Sicherheitseinstellungen offen.
    - Beispielkonten über `seed_demo`; Passwort steht in `.env` (DEMO_PASSWORD).
    - **Änderung nach erstem Ausprobieren (Entscheidung 004):** Der Administrator darf alles. Alle sehen alle Projekte in der Liste, fremde nur mit Name, Zeitraum und Projektleitung ohne Link. Öffnen dürfen nur Mitglieder und der Administrator, sonst 403 „Kein Zugriff“. Umgesetzt durch developer; 248 Tests grün (vom Hauptdialog erneut ausgeführt). Nachgeprüft per Testclient für Mitarbeiter, Management und Administrator. Das Demo-Passwort hat der Benutzer selbst geändert; seed_demo wurde erneut ausgeführt und die Anmeldesperren zurückgesetzt.
-   - **V07a vom Benutzer am 21.10.2026 abgenommen.** V07b in Umsetzung.
+   - **V07a vom Benutzer am 21.10.2026 abgenommen.**
+4. **V07b (gemeinsame Aufgaben) umgesetzt** (21.10.2026) durch developer: Buckets, Aufgaben mit Mehrfachzuweisung, Abschließen und Wiederöffnen mit Verlauf, Filter, „Mein Arbeitsplatz“ (Überfällig/Heute/Demnächst/Ohne Fälligkeit/Kürzlich erledigt), persönliche Aufgaben, Admin-Kennzeichnung.
+   - Ein Unterbruch durch das Nutzungslimit wurde ohne Datenverlust fortgesetzt.
+   - **Review:** keine Rechtelücke. Vier Befunde behoben: Zuweisungen enden bei Ausscheiden oder Rollenwechsel, Test für ausgeschiedene Mitglieder, Sperrreihenfolge, Namen statt E-Mail im Verlauf.
+   - **Nachweise:** 473 Tests grün (vom Hauptdialog erneut ausgeführt); ruff, `check` und `makemigrations --check` sauber.
+   - **Browserprüfung:** Arbeitsplatz-Gruppen; geteilte Aufgabe abschließen, Erscheinen unter „Kürzlich erledigt“, Wiederöffnen mit Verlauf; Filterzähler; Darkmode; schmale Breite ohne Überbreite; keine Konsolenfehler.
+   - Für den Browsertest wurde eine lokale Testsitzung erzeugt und danach gelöscht.
+   - Zuständige ändern nur Projektleiter und Administrator; die Empfehlung wurde umgesetzt, 478 Tests grün. Mitarbeiter dürfen Titel, Beschreibung, Fälligkeit und Bucket ändern.
+   - **Offen:** kein Status „In Arbeit“ und keine Priorität (beides für Etappe 5 bestätigt); Buckets lassen sich nicht archivieren; ältere Dev-Verlaufseinträge zeigen noch E-Mail statt Namen.
+   - **V07b vom Benutzer am 21.10.2026 abgenommen.**
+5. **Nächste Etappe 3, externe Demo:** Auftrag in docs/auftrag-demo-ansicht.md (Vorschlag). Wartet auf drei Benutzerfreigaben: Tunnel-Anbieter (Empfehlung Microsoft Dev Tunnels), Paket whitenoise und eine eigene Demo-Datenbank. Etappe 2 (Arbeitsplatz) wartet auf das Feedback des Benutzers zur echten Version.
 4. Der virtuelle Windows-Server kommt erst beim späteren Umzug von privater Entwicklung in berufliche Nutzung. Serverversion, Hosting und konkrete produktive Pipeline blockieren die lokale Entwicklung nicht. Keine WSL-/Linux-Installation.
 
 ## Offen

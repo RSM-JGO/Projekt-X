@@ -12,7 +12,7 @@ PASSWORT = "Test-Passwort-fuer-Tests-123"
 
 @pytest.fixture(scope="session")
 def django_db_setup(django_db_setup, django_db_blocker):
-    """Nur in der Testdatenbank: TRUNCATE-Sperre des Protokolls abschalten.
+    """Nur in der Testdatenbank: TRUNCATE-Sperre von Protokoll und Aufgabenverlauf abschalten.
 
     Djangos flush (Tests mit transaction=True) leert alle Tabellen per TRUNCATE und würde
     sonst scheitern. UPDATE- und DELETE-Sperre bleiben aktiv; die TRUNCATE-Sperre selbst wird
@@ -20,6 +20,7 @@ def django_db_setup(django_db_setup, django_db_blocker):
     """
     with django_db_blocker.unblock(), connection.cursor() as cursor:
         cursor.execute("ALTER TABLE audit_auditlog DISABLE TRIGGER audit_auditlog_no_truncate")
+        cursor.execute("ALTER TABLE tasks_taskevent DISABLE TRIGGER tasks_taskevent_no_truncate")
 
 
 @pytest.fixture
@@ -83,3 +84,55 @@ def welt(make_user):
     m["pl"] = a.memberships.get(user=u["pl"])
     m["pl_b"] = b.memberships.get(user=u["pl_b"])
     return {"users": u, "a": a, "b": b, "memberships": m}
+
+
+@pytest.fixture
+def aufgaben(welt):
+    """Buckets und Aufgaben auf Basis von welt.
+
+    t_ma: Projekt A, zugewiesen an ma | t_pl: Projekt A, zugewiesen an pl
+    t_b:  Projekt B, zugewiesen an ma_b
+    p_ma: persönliche Aufgabe von ma | p_nobody: persönliche Aufgabe von nobody
+    """
+    from apps.tasks import services as task_services
+
+    u, a, b = welt["users"], welt["a"], welt["b"]
+    planung = task_services.create_bucket(actor=u["pl"], project=a, name="Planung")
+    umsetzung = task_services.create_bucket(actor=u["pl"], project=a, name="Umsetzung")
+    vorbereitung = task_services.create_bucket(actor=u["pl_b"], project=b, name="Vorbereitung")
+    t = {
+        "t_ma": task_services.create_project_task(
+            actor=u["pl"],
+            project=a,
+            bucket=planung,
+            title="Aufgabe MA",
+            description="Geheime Aufgabenbeschreibung A",
+            assignees=[u["ma"]],
+        ),
+        "t_pl": task_services.create_project_task(
+            actor=u["pl"],
+            project=a,
+            bucket=umsetzung,
+            title="Aufgabe PL",
+            description="Geheime Aufgabenbeschreibung A2",
+            assignees=[u["pl"]],
+        ),
+        "t_b": task_services.create_project_task(
+            actor=u["pl_b"],
+            project=b,
+            bucket=vorbereitung,
+            title="Aufgabe B",
+            description="Geheime Aufgabenbeschreibung B",
+            assignees=[u["ma_b"]],
+        ),
+        "p_ma": task_services.create_personal_task(
+            actor=u["ma"], title="Privat MA", description="Geheime private Notiz MA"
+        ),
+        "p_nobody": task_services.create_personal_task(
+            actor=u["nobody"], title="Privat Nobody", description="Geheime private Notiz N"
+        ),
+    }
+    return welt | {
+        "tasks": t,
+        "buckets": {"planung": planung, "umsetzung": umsetzung, "vorbereitung": vorbereitung},
+    }

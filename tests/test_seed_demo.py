@@ -75,3 +75,43 @@ def test_seed_demo_ist_idempotent_und_gekennzeichnet(settings, monkeypatch):
     assert sichtbar("management@beispiel.invalid") == {a}
     assert User.objects.get(email="admin@beispiel.invalid").is_admin
     assert User.objects.get(email="projektleitung@beispiel.invalid").can_create_projects
+
+
+@pytest.mark.django_db
+def test_seed_demo_aufgaben_idempotent(settings, monkeypatch):
+    from apps.tasks.models import Bucket, Task, TaskAssignment, TaskEvent, TaskStatus
+
+    settings.DEBUG = True
+    monkeypatch.setenv("DEMO_PASSWORD", "Demo-Passwort-fuer-Tests-1")
+    call_command("seed_demo")
+    zaehlung = (
+        Bucket.objects.count(),
+        Task.objects.count(),
+        TaskAssignment.objects.count(),
+        TaskEvent.objects.count(),
+    )
+    call_command("seed_demo")
+    assert (
+        Bucket.objects.count(),
+        Task.objects.count(),
+        TaskAssignment.objects.count(),
+        TaskEvent.objects.count(),
+    ) == zaehlung
+
+    for project in Project.objects.all():
+        assert 2 <= Bucket.objects.filter(project=project).count() <= 3
+        assert Task.objects.filter(project=project).count() == 6
+        assert Task.objects.filter(project=project, status=TaskStatus.ERLEDIGT).exists()
+    pl = User.objects.get(email="projektleitung@beispiel.invalid")
+    ma1 = User.objects.get(email="mitarbeiter1@beispiel.invalid")
+    gemeinsam = [
+        t
+        for t in Task.objects.filter(project__isnull=False)
+        if set(t.assignments.filter(ended_at=None).values_list("user", flat=True))
+        == {pl.pk, ma1.pk}
+    ]
+    assert gemeinsam
+    for owner in (pl, ma1):
+        persoenlich = Task.objects.filter(owner=owner)
+        assert persoenlich.count() == 1
+        assert "(Beispiel)" in persoenlich.get().title

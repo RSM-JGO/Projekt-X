@@ -1,0 +1,5 @@
+{# Status mit Text und Symbol, Farbe nur als Fläche/Symbol: grün erledigt, rot überfällig, orange heute, sonst neutral offen #}
+{% if task.is_done %}<span class="badge tone-mint"><span class="badge__icon" aria-hidden="true"><span>✓</span></span>Erledigt</span>
+{% elif overdue %}<span class="badge tone-rose"><span class="badge__icon" aria-hidden="true"><span>!</span></span>Offen · überfällig</span>
+{% elif is_today %}<span class="badge tone-peach"><span class="badge__icon" aria-hidden="true"><span>●</span></span>Offen · heute fällig</span>
+{% else %}<span class="badge tone-neutral badge--plain">Offen</span>{% endif %}
