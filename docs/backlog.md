@@ -13,9 +13,9 @@ Status: Offen, In Arbeit, Zur Prüfung, Erledigt. Ein technischer Nachweis und e
 | V01 | Claude-Arbeitsregeln und sechs Rollen vorbereiten | Erledigt | Dateien vorhanden; Claude bestätigt alle sechs als geladene aufrufbare Unteragenten; einzelner Probelauf noch nicht erfolgt |
 | V02 | GitHub-Konto und privates Repository verbinden | Erledigt | Privates Repository angelegt, origin verbunden, bestätigte noreply-Identität eingerichtet und erster Commit erfolgreich hochgeladen |
 | V03 | Claude mit lokalem Projektordner verbinden | Erledigt | Benutzer hat Workspace freigegeben; Claude liest die Unterlagen und benennt alle sechs geladenen Rollen |
-| V04 | Architektur und Betriebsrahmen abstimmen | In Arbeit (Entwurf Revision 2 in docs/entwurf-nacharbeit.md, Benutzerentscheidung T1 offen) | Begründete Technikauswahl, Systemgrenzen, Datenmodell und Entwicklungsbefehle dokumentiert |
+| V04 | Architektur und Betriebsrahmen abstimmen | In Arbeit (T1 bestätigt; Windows-Entwurf Revision 3 in docs/entwurf-windows-betrieb.md; Installationsfreigabe sowie W-B bis W-E offen) | Begründete Technikauswahl, Systemgrenzen, Datenmodell und Entwicklungsbefehle dokumentiert |
 | V05 | Berechtigungsmodell konkretisieren | Offen | Rechte für alle vier Rollen, Projektgrenzen, Dateien und Freigaben überprüfbar beschrieben |
-| V06 | Styleguide abstimmen | Offen | Navigationsmuster, Farben, Schrift, Dichte und zentrale Komponenten anhand von Ansichten bestätigt |
+| V06 | Styleguide abstimmen | In Arbeit (Designvorschau unter design/; Gestaltung vom Benutzer grundsätzlich akzeptiert, einfacher Hell/Dunkel-Umschalter umgesetzt; Aufbau, besonders des Arbeitsplatzes, noch zu überarbeiten, vom Benutzer auf später gelegt) | Klickbare lokale Vorschau mit Beispieldaten, Projekt X, modernen Pastellakzenten und Hell/Dunkel; danach Benutzerfeedback und Bestätigung |
 | V07 | Ersten Entwicklungsabschnitt definieren | Offen | Kleiner vollständiger Ablauf mit Abnahmekriterien und geeigneten Prüfungen beauftragt |
 
 ## Fachlicher Funktionsvorrat

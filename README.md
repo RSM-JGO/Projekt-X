@@ -17,5 +17,7 @@ Vorbereitungsstand vom 21. Oktober 2026. Noch keine Anwendungsimplementierung.
 11. `docs/pruefung-architekturentwuerfe.md`: Erforderliche Nacharbeit vor Architekturfreigabe.
 12. `docs/releaseprozess.md`: Aufgaben des Releasemanagers und vorgeschlagener Releaseablauf.
 13. `docs/entwurf-nacharbeit.md`: Überarbeiteter Architekturentwurf (Revision 2, nicht freigegeben) mit neu gegliederter Entscheidungsvorlage.
+14. `docs/entwurf-windows-betrieb.md`: Windows-Entwicklung, Windows-Betrieb, Pipeline und externe Demo (Revision 3, Entwurf).
+15. `docs/installationsliste-windows.md`: Lokale Installationen zur Freigabe durch den Benutzer.
 
 Der lokale Ordner ist die Arbeitskopie. Das private GitHub-Repository https://github.com/jago1698/projektmanagement-software ist erstellt und als origin verbunden. Die Grundvorbereitung ist hochgeladen. Claude kann die Unterlagen lesen und bestätigt alle acht geladenen Rollen einschließlich Projektleitung und Releasemanager. Server, Domain, Datenbank, E-Mail-Dienst und Deployment-Pipeline sind noch nicht eingerichtet. Aktueller Arbeitsstand: docs/arbeitsstand.md.

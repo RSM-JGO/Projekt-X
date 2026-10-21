@@ -6,6 +6,8 @@ Datum: 21. Oktober 2026. Status: beschlossen, ausdrückliche Vorgabe des Benutze
 
 Projekt X soll auf einem virtuellen Windows-Server betrieben werden. Der lokale Arbeitsplatz bleibt Windows mit Claude Desktop. Die Linux- und Containeranteile der Entscheidung 001 und der bisherigen Architekturentwürfe sind damit ersetzt. Django, PostgreSQL, die Weboberfläche, GitHub sowie getrennte Dev-/Prod-Umgebungen bleiben die technische Grundrichtung.
 
+Zeitliche Präzisierung des Benutzers: Der Windows-Server kommt erst nach der privaten Entwicklung für den späteren Umzug in die berufliche Nutzung. Jetzt lokal entwickeln und testen. Serverzugang, Serverversion und produktive Pipeline sind keine Voraussetzung für den Start. Externe Zwischenstands-Demos sind eine mögliche spätere Ergänzung, noch kein beauftragtes Hosting.
+
 WSL und Linux-Container sind keine geplanten Voraussetzungen mehr. WSL wurde nicht installiert; es sind keine entsprechenden Schritte zu wiederholen. Docker Desktop ist kein Ziel für den Windows-Server. Die genaue Windows-Server-Version ist noch unbekannt.
 
 ## Nacharbeit

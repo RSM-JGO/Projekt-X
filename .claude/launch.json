@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "designvorschau",
+      "runtimeExecutable": "C:\\Users\\jango\\.uv\\python\\cpython-3.13-windows-x86_64-none\\python.exe",
+      "runtimeArgs": ["-m", "http.server", "8123", "--bind", "127.0.0.1", "--directory", "design"],
+      "port": 8123
+    }
+  ]
+}
