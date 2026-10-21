@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Anmeldung vorübergehend gesperrt{% endblock %}
+{% block body %}
+<main id="main" class="auth-page">
+  <section class="card auth-card" aria-labelledby="locked-title">
+    <div class="auth-top">
+      <span class="wordmark"><img class="wordmark__logo" src="{% static 'img/logo-projekt-x.webp' %}" alt="Projekt X" width="2000" height="667"></span>
+      {% include "partials/theme_toggle.html" %}
+    </div>
+    <h1 id="locked-title" class="auth-title">Anmeldung vorübergehend gesperrt</h1>
+    <p>Zu viele fehlgeschlagene Anmeldeversuche. Bitte in 15 Minuten erneut versuchen.</p>
+    <p class="card__hint auth-hint"><a href="{% url 'accounts:login' %}">Zur Anmeldung</a></p>
+  </section>
+</main>
+{% endblock %}

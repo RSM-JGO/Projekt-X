@@ -1,0 +1,24 @@
+{% extends "app_base.html" %}
+{% block title %}Mitglied entfernen{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div class="page-head__text">
+    <p class="breadcrumb"><a href="{% url 'projects:list' %}">Projekte</a> / <a href="{% url 'projects:detail' project.public_id %}">{{ project.name }}</a></p>
+    <h1>Mitglied entfernen</h1>
+  </div>
+</div>
+
+{% if acts_as_admin %}<p class="note note--admin">Du handelst als Administrator. Die Änderung wird protokolliert.</p>{% endif %}
+
+<section class="card">
+  {% if error %}<div class="form-errors" role="alert"><p>{{ error }}</p></div>{% endif %}
+  <form class="form" method="post">
+    {% csrf_token %}
+    <p><strong>{{ membership.user.display_name }}</strong> ({{ roles|join:", " }}) wird aus dem Projekt entfernt. Die bisherige Mitgliedschaft bleibt im Verlauf erhalten.</p>
+    <div class="form__actions">
+      <button type="submit" class="btn btn--danger">Entfernen</button>
+      <a class="btn btn--ghost" href="{% url 'projects:detail' project.public_id %}">Abbrechen</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

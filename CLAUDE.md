@@ -29,7 +29,7 @@ Lies zuerst README.md, docs/produktgrundlage.md und docs/vorbereitung-und-betrie
 
 ## Fachliche Leitplanken
 
-- Vier Benutzerrollen: Administrator, Projektleiter, Mitarbeiter, Management. Detaillierte Rechte noch offen. Projektleiter erteilt Freigaben.
+- Vier Benutzerrollen: Administrator, Projektleiter, Mitarbeiter, Management. Detaillierte Rechte noch offen. Projektleiter und Administrator erteilen Freigaben (Entscheidung 004); der Administrator darf uneingeschränkt alles, Administratoraktionen werden gekennzeichnet protokolliert.
 - Aufgaben können mehreren Personen zugewiesen werden; gemeinsame Aufgabe und gemeinsamer Status.
 - Ein Bucket und optional ein Meilenstein je Aufgabe. Erledigte Aufgaben bleiben einsehbar.
 - Ursprünglicher Plan, aktuell genehmigter Plan, Prognose und tatsächliche Termine bleiben unterscheidbar und historisiert.

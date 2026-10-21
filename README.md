@@ -35,5 +35,7 @@ Voraussetzungen: uv, Python 3.13 über uv, PostgreSQL 18 mit Rolle `projektx` un
 | Tests | `uv run pytest` |
 | Codeprüfung | `uv run ruff check` und `uv run ruff format --check` |
 | Fehlende Migrationen | `uv run python manage.py makemigrations --check --dry-run` |
+| Administrator anlegen (fragt E-Mail, Name, Passwort) | `uv run python manage.py create_admin` (optional `--mit-django-admin` für /admin) |
+| Beispieldaten laden (nur mit `DJANGO_DEBUG=1`, Passwort aus `DEMO_PASSWORD`, mehrfach ausführbar) | `uv run python manage.py seed_demo` |
 
 Gesundheitsprüfung: http://127.0.0.1:8000/health/

@@ -1,0 +1,14 @@
+{% load static %}<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>{% block title %}Projekt X{% endblock %} – Projekt X</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <script src="{% static 'js/theme.js' %}"></script>
+</head>
+<body>
+{% block body %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,77 @@
+"""Beispieldaten: nur mit DEBUG, gekennzeichnet, idempotent."""
+
+import pytest
+from django.contrib.auth import get_user_model
+from django.core.management import call_command
+from django.core.management.base import CommandError
+
+from apps.audit.models import AuditLog
+from apps.projects.models import Project, ProjectMembership, ProjectRoleAssignment
+from apps.projects.selectors import accessible_projects
+
+User = get_user_model()
+
+
+@pytest.mark.django_db
+def test_seed_demo_bricht_ohne_debug_ab(settings, monkeypatch):
+    settings.DEBUG = False
+    monkeypatch.setenv("DEMO_PASSWORD", "Demo-Passwort-fuer-Tests-1")
+    with pytest.raises(CommandError, match="DEBUG"):
+        call_command("seed_demo")
+    assert not User.objects.exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("wert", [None, "", "HIER_EINTRAGEN"])
+def test_seed_demo_bricht_ohne_passwort_ab(settings, monkeypatch, wert):
+    settings.DEBUG = True
+    if wert is None:
+        monkeypatch.delenv("DEMO_PASSWORD", raising=False)
+    else:
+        monkeypatch.setenv("DEMO_PASSWORD", wert)
+    with pytest.raises(CommandError, match="DEMO_PASSWORD"):
+        call_command("seed_demo")
+    assert not User.objects.exists()
+
+
+@pytest.mark.django_db
+def test_seed_demo_ist_idempotent_und_gekennzeichnet(settings, monkeypatch):
+    settings.DEBUG = True
+    monkeypatch.setenv("DEMO_PASSWORD", "Demo-Passwort-fuer-Tests-1")
+    call_command("seed_demo")
+    zaehlung = (
+        User.objects.count(),
+        Project.objects.count(),
+        ProjectMembership.objects.count(),
+        ProjectRoleAssignment.objects.count(),
+        AuditLog.objects.count(),
+    )
+    call_command("seed_demo")
+    call_command("seed_demo")
+    assert (
+        User.objects.count(),
+        Project.objects.count(),
+        ProjectMembership.objects.count(),
+        ProjectRoleAssignment.objects.count(),
+        AuditLog.objects.count(),
+    ) == zaehlung
+    assert zaehlung[:2] == (5, 2)
+
+    for user in User.objects.all():
+        assert user.email.endswith("@beispiel.invalid")
+        assert "(Beispiel)" in user.display_name
+        assert user.check_password("Demo-Passwort-fuer-Tests-1")
+    for project in Project.objects.all():
+        assert "(Beispiel)" in project.name
+
+    def sichtbar(email):
+        return {p.name[:18] for p in accessible_projects(User.objects.get(email=email))}
+
+    a, b = "Beispielprojekt A ", "Beispielprojekt B "
+    assert sichtbar("admin@beispiel.invalid") == {a, b}
+    assert sichtbar("projektleitung@beispiel.invalid") == {a, b}
+    assert sichtbar("mitarbeiter1@beispiel.invalid") == {a, b}
+    assert sichtbar("mitarbeiter2@beispiel.invalid") == {a}
+    assert sichtbar("management@beispiel.invalid") == {a}
+    assert User.objects.get(email="admin@beispiel.invalid").is_admin
+    assert User.objects.get(email="projektleitung@beispiel.invalid").can_create_projects

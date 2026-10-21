@@ -39,6 +39,6 @@ def test_eigenes_benutzermodell_ist_aktiv():
 @pytest.mark.django_db
 def test_benutzer_wird_in_der_datenbank_gespeichert():
     user = get_user_model().objects.create_user(
-        username="beispiel", password="Beispiel-Passwort-123"
+        email="beispiel@test.invalid", password="Beispiel-Passwort-123", display_name="Beispiel"
     )
     assert get_user_model().objects.get(pk=user.pk).check_password("Beispiel-Passwort-123")

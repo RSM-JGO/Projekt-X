@@ -1,0 +1,10 @@
+{% extends "app_base.html" %}
+{% block title %}Nicht gefunden{% endblock %}
+{% block content %}
+<div class="empty-state">
+  <span class="empty-state__icon" aria-hidden="true">?</span>
+  <h1>Nicht gefunden</h1>
+  <p class="muted">Diese Seite gibt es nicht oder sie ist für dich nicht sichtbar.</p>
+  <a class="btn" href="{% url 'projects:list' %}">Zur Projektübersicht</a>
+</div>
+{% endblock %}

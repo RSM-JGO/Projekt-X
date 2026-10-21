@@ -1,0 +1,25 @@
+{% extends "app_base.html" %}
+{% block title %}Rollen ändern{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div class="page-head__text">
+    <p class="breadcrumb"><a href="{% url 'projects:list' %}">Projekte</a> / <a href="{% url 'projects:detail' project.public_id %}">{{ project.name }}</a></p>
+    <h1>Rollen ändern: {{ membership.user.display_name }}</h1>
+  </div>
+</div>
+
+{% if acts_as_admin %}<p class="note note--admin">Du handelst als Administrator. Die Änderung wird protokolliert.</p>{% endif %}
+
+<section class="card">
+  <form class="form" method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+    {% include "partials/field.html" with field=form.roles %}
+    <p class="card__hint">Jedes Projekt braucht mindestens einen aktiven Projektleiter.</p>
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">Speichern</button>
+      <a class="btn btn--ghost" href="{% url 'projects:detail' project.public_id %}">Abbrechen</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

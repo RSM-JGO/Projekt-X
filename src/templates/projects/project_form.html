@@ -1,0 +1,31 @@
+{% extends "app_base.html" %}
+{% block title %}{% if project %}Projekt bearbeiten{% else %}Projekt anlegen{% endif %}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div class="page-head__text">
+    <p class="breadcrumb"><a href="{% url 'projects:list' %}">Projekte</a>{% if project %} / <a href="{% url 'projects:detail' project.public_id %}">{{ project.name }}</a>{% endif %}</p>
+    <h1>{% if project %}Projekt bearbeiten{% else %}Projekt anlegen{% endif %}</h1>
+    {% if not project %}<p class="page-head__meta">Du wirst automatisch Projektleiter des neuen Projekts.</p>{% endif %}
+  </div>
+</div>
+
+{% if acts_as_admin %}<p class="note note--admin">Du handelst als Administrator. Die Änderung wird protokolliert.</p>{% endif %}
+
+<section class="card">
+  <form class="form" method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+    {% include "partials/field.html" with field=form.name %}
+    {% include "partials/field.html" with field=form.description %}
+    <div class="form__row--split">
+      {% include "partials/field.html" with field=form.start_date %}
+      {% include "partials/field.html" with field=form.end_date %}
+    </div>
+    <p class="card__hint">Der Projektzeitraum ist vorläufig ein einfaches Feld; Änderungen werden protokolliert.</p>
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">{% if project %}Speichern{% else %}Projekt anlegen{% endif %}</button>
+      <a class="btn btn--ghost" href="{% if project %}{% url 'projects:detail' project.public_id %}{% else %}{% url 'projects:list' %}{% endif %}">Abbrechen</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

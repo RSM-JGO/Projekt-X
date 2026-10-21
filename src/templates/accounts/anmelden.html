@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Anmelden{% endblock %}
+{% block body %}
+<main id="main" class="auth-page">
+  <section class="card auth-card" aria-labelledby="auth-title">
+    <div class="auth-top">
+      <span class="wordmark"><img class="wordmark__logo" src="{% static 'img/logo-projekt-x.webp' %}" alt="Projekt X" width="2000" height="667"></span>
+      {% include "partials/theme_toggle.html" %}
+    </div>
+    <h1 id="auth-title" class="auth-title">Anmelden</h1>
+    <form class="form" method="post" action="{% url 'accounts:login' %}" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+      {% include "partials/field.html" with field=form.username %}
+      {% include "partials/field.html" with field=form.password %}
+      <input type="hidden" name="next" value="{{ next }}">
+      <div class="form__actions"><button type="submit" class="btn btn--primary">Anmelden</button></div>
+    </form>
+    <p class="card__hint auth-hint">Konten legt der Administrator an. Eine Selbstregistrierung gibt es nicht.</p>
+  </section>
+  {% if is_dev_environment %}<span class="dev-hint">Entwicklungsumgebung</span>{% endif %}
+</main>
+{% endblock %}

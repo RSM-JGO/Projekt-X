@@ -37,12 +37,14 @@ Der Benutzer soll die Entwicklung nach abgeschlossener Einrichtung direkt in Cla
 
 1. Der zentrale Claude-Chat „Projektleitung und Rollenüberblick“ übernimmt ab jetzt den Single Point of Contact. Die acht Rollen sind eingerichtet und nachgewiesen.
 2. Erledigt: Designvorschau (V06) mit Logo und Farbregeln; lokale Umgebung; Django-Grundgerüst. Der Aufbau des Arbeitsplatzes wird später überarbeitet (Wunsch des Benutzers).
-3. Als Nächstes: erster echter Ablauf (V07) mit Anmeldung, Projekten und gemeinsamen Aufgaben, mit Rechten und Tests. Vorher beim Benutzer klären:
-   - Darf der Administrator Aufgaben korrigieren?
-   - Dürfen persönliche Aufgaben geteilt werden?
-   - Werden Zeiträume für Arbeitspakete gebraucht?
-   - Muss die E-Mail-Adresse eindeutig sein?
-   Die Oberfläche folgt den Regeln in docs/styleguide-briefing.md.
+3. **V07a (Anmeldung, Projekte, Mitgliedschaften) umgesetzt** (21.10.2026), mit den Paketen argon2-cffi und django-axes (freigegeben). Umgesetzt durch developer, geprüft durch reviewer; fünf Befunde behoben (u. a. Administrator darf Projekte nicht bearbeiten, einziger Projektleiter nicht deaktivierbar, zusätzliche IP-Sperre bei 30 Fehlversuchen, Protokoll auch gegen TRUNCATE geschützt, Nebenläufigkeitstest).
+   - **Nachweise:** 231 Tests grün (vom Hauptdialog erneut ausgeführt); ruff, `check` und `makemigrations --check` sauber.
+   - **Browserprüfung:** Anmelden und Abmelden; Mitarbeiter sieht nur eigene Projekte, Bearbeiten wird mit 403 abgewiesen, fremdes Projekt liefert 404; Mitgliedschaften anderer Projekte liefern 404; der letzte Projektleiter wird abgelehnt; Projekt anlegen macht die anlegende Person zum Projektleiter; falscher Zeitraum wird abgewiesen; Administrator Bearbeiten 403, Mitglieder verwalten 200; Hell/Dunkel; 375 px ohne Überbreite.
+   - Die Accounts-Migration 0001 wurde neu erzeugt; die Dev-Datenbank hatte keine Benutzer.
+   - **Nicht geprüft:** /admin im Browser; Protokolleinträge durch create_admin/createsuperuser fehlen; Prod-Sicherheitseinstellungen offen.
+   - Beispielkonten über `seed_demo`; Passwort steht in `.env` (DEMO_PASSWORD).
+   - **Änderung nach erstem Ausprobieren (Entscheidung 004):** Der Administrator darf alles. Alle sehen alle Projekte in der Liste, fremde nur mit Name, Zeitraum und Projektleitung ohne Link. Öffnen dürfen nur Mitglieder und der Administrator, sonst 403 „Kein Zugriff“. Umgesetzt durch developer; 248 Tests grün (vom Hauptdialog erneut ausgeführt). Nachgeprüft per Testclient für Mitarbeiter, Management und Administrator. Das Demo-Passwort hat der Benutzer selbst geändert; seed_demo wurde erneut ausgeführt und die Anmeldesperren zurückgesetzt.
+   - **V07a vom Benutzer am 21.10.2026 abgenommen.** V07b in Umsetzung.
 4. Der virtuelle Windows-Server kommt erst beim späteren Umzug von privater Entwicklung in berufliche Nutzung. Serverversion, Hosting und konkrete produktive Pipeline blockieren die lokale Entwicklung nicht. Keine WSL-/Linux-Installation.
 
 ## Offen

@@ -1,0 +1,101 @@
+{% extends "app_base.html" %}
+{% load px %}
+{% block title %}Projekte{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div class="page-head__text">
+    <h1>Projekte</h1>
+    <p class="page-head__meta">
+      {{ overview.accessible|length }} mit Zugriff · {{ overview.others|length }} weitere
+    </p>
+  </div>
+  {% if can_create %}
+    <div class="page-head__actions"><a class="btn btn--primary" href="{% url 'projects:create' %}">Projekt anlegen</a></div>
+  {% endif %}
+</div>
+
+<section class="section" aria-labelledby="meine-title">
+  <div class="card__head">
+    <h2 id="meine-title">{% if user.is_admin %}Alle Projekte (Administrator){% else %}Meine Projekte{% endif %}</h2>
+  </div>
+  {% if overview.accessible %}
+  <div class="table-wrap table-wrap--cards">
+    <table class="table table--cards">
+      <caption class="sr-only">Projekte, die du öffnen kannst</caption>
+      <thead>
+        <tr><th scope="col">Projekt</th><th scope="col">Zeitraum</th><th scope="col">Projektleitung</th><th scope="col">Meine Rollen</th></tr>
+      </thead>
+      <tbody>
+        {% for row in overview.accessible %}
+        <tr>
+          <td data-label="Projekt">
+            <a class="table__title" href="{% url 'projects:detail' row.project.public_id %}">{{ row.project.name }}</a>
+            {% if row.project.description %}<span class="table__sub">{{ row.project.description|truncatechars:120 }}</span>{% endif %}
+          </td>
+          <td data-label="Zeitraum" class="num">{{ row.project.start_date|date:"d.m.Y" }} – {{ row.project.end_date|date:"d.m.Y" }}</td>
+          <td data-label="Projektleitung">
+            <ul class="people">
+              {% for lead in row.leads %}
+                <li class="person-inline"><span class="avatar{% if lead.pk == user.pk %} is-me{% endif %}" aria-hidden="true">{{ lead|initials }}</span><span>{{ lead.display_name }}</span></li>
+              {% empty %}
+                <li class="muted">Keine aktive Projektleitung</li>
+              {% endfor %}
+            </ul>
+          </td>
+          <td data-label="Meine Rollen">
+            {% if row.my_roles %}
+              <span class="chips">{% for role in row.my_roles %}<span class="chip {{ role|role_tone }}">{{ role.label }}</span>{% endfor %}</span>
+            {% else %}
+              <span class="muted">Keine (Zugriff als Administrator)</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <span class="empty-state__icon" aria-hidden="true">+</span>
+    <h3>Noch keine eigenen Projekte</h3>
+    <p class="muted">{% if can_create %}Lege ein Projekt an.{% else %}Sobald dich eine Projektleitung hinzufügt, kannst du das Projekt hier öffnen.{% endif %}</p>
+    {% if can_create %}<a class="btn btn--primary" href="{% url 'projects:create' %}">Projekt anlegen</a>{% endif %}
+  </div>
+  {% endif %}
+</section>
+
+{% if overview.others %}
+<section class="section section--spaced" aria-labelledby="weitere-title">
+  <div class="card__head">
+    <h2 id="weitere-title">Weitere Projekte</h2>
+    <span class="card__hint">Nur Eckdaten. Öffnen können Mitglieder des Projekts.</span>
+  </div>
+  <div class="table-wrap table-wrap--cards">
+    <table class="table table--cards table--muted">
+      <caption class="sr-only">Weitere Projekte ohne Zugriff</caption>
+      <thead>
+        <tr><th scope="col">Projekt</th><th scope="col">Zeitraum</th><th scope="col">Projektleitung</th><th scope="col">Zugriff</th></tr>
+      </thead>
+      <tbody>
+        {% for row in overview.others %}
+        <tr>
+          <td data-label="Projekt"><span class="table__title">{{ row.name }}</span></td>
+          <td data-label="Zeitraum" class="num">{{ row.start_date|date:"d.m.Y" }} – {{ row.end_date|date:"d.m.Y" }}</td>
+          <td data-label="Projektleitung">
+            <ul class="people">
+              {% for lead in row.leads %}
+                <li class="person-inline"><span class="avatar" aria-hidden="true">{{ lead|initials }}</span><span>{{ lead.display_name }}</span></li>
+              {% empty %}
+                <li class="muted">Keine aktive Projektleitung</li>
+              {% endfor %}
+            </ul>
+          </td>
+          <td data-label="Zugriff"><span class="chip tone-neutral">kein Zugriff</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

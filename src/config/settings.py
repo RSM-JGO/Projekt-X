@@ -5,6 +5,7 @@ Umgebungsvariablen bzw. der lokalen Datei .env, die nicht in Git liegt.
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
@@ -36,8 +37,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "axes",
     "apps.core",
     "apps.accounts",
+    "apps.audit",
+    "apps.projects",
 ]
 
 MIDDLEWARE = [
@@ -48,6 +52,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # Muss am Ende stehen (Sperre nach Fehlversuchen)
+    "axes.middleware.AxesMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -56,13 +62,14 @@ WSGI_APPLICATION = "config.wsgi.application"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "src" / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "apps.core.context_processors.environment",
             ],
         },
     },
@@ -101,3 +108,37 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Lokal wird keine E-Mail versendet, nur protokolliert
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+STATICFILES_DIRS = [BASE_DIR / "src" / "static"]
+
+# ---------- Anmeldung ----------
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "projects:list"
+LOGOUT_REDIRECT_URL = "accounts:login"
+
+# Argon2 als Standard; die übrigen nur zum Prüfen älterer Hashes
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "django.contrib.auth.hashers.ScryptPasswordHasher",
+]
+
+# django-axes zuerst, damit gesperrte Anmeldungen gar nicht erst geprüft werden
+AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesStandaloneBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+# Sperre nach 5 Fehlversuchen für 15 Minuten, gezählt je E-Mail-Adresse und IP-Adresse;
+# zusätzlich nach 30 Fehlversuchen je IP-Adresse allein.
+# Die Sperre greift auch für nicht existierende Konten, verrät also keine Kontoexistenz.
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = timedelta(minutes=15)
+AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
+AXES_USERNAME_CALLABLE = "apps.accounts.lockout.lockout_username"
+AXES_HANDLER = "apps.accounts.lockout.LoginLockoutHandler"
+# Zusätzliche Sperre je IP-Adresse allein (eigener Handler, siehe apps/accounts/lockout.py)
+LOGIN_IP_FAILURE_LIMIT = 30
+AXES_RESET_ON_SUCCESS = True
+AXES_LOCKOUT_TEMPLATE = "accounts/gesperrt.html"
+AXES_VERBOSE = False

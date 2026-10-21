@@ -1,0 +1,65 @@
+{% extends "app_base.html" %}
+{% load px %}
+{% block title %}{{ project.name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div class="page-head__text">
+    <p class="breadcrumb"><a href="{% url 'projects:list' %}">Projekte</a></p>
+    <h1>{{ project.name }}</h1>
+    <p class="page-head__meta">
+      {% if my_roles %}Deine Rollen:
+        {% for role in my_roles %}<span class="chip {{ role|role_tone }}">{{ role.label }}</span> {% endfor %}
+      {% elif acts_as_admin %}Du siehst dieses Projekt als Administrator.{% endif %}
+    </p>
+  </div>
+  {% if can_edit %}
+    <div class="page-head__actions"><a class="btn" href="{% url 'projects:edit' project.public_id %}">Projekt bearbeiten</a></div>
+  {% endif %}
+</div>
+
+<div class="card-grid">
+  <section class="card" aria-labelledby="steckbrief-title">
+    <div class="card__head"><h2 id="steckbrief-title">Steckbrief</h2><span class="card__hint">Kurzinfo</span></div>
+    <dl class="facts">
+      <div><dt>Beginn</dt><dd>{{ project.start_date|date:"d.m.Y" }}</dd></div>
+      <div><dt>Ende</dt><dd>{{ project.end_date|date:"d.m.Y" }}</dd></div>
+      <div><dt>Projektleitung</dt><dd>{% for lead in leads %}{{ lead.display_name }}{% if not forloop.last %}, {% endif %}{% empty %}<span class="muted">keine</span>{% endfor %}</dd></div>
+      <div><dt>Mitglieder</dt><dd>{{ members|length }}</dd></div>
+      <div><dt>Angelegt</dt><dd>{{ project.created_at|date:"d.m.Y" }} von {{ project.created_by.display_name }}</dd></div>
+    </dl>
+    {% if project.description %}<p class="description">{{ project.description }}</p>{% endif %}
+  </section>
+
+  <section class="card" aria-labelledby="mitglieder-title">
+    <div class="card__head">
+      <h2 id="mitglieder-title">Mitglieder</h2>
+      {% if can_manage_members %}<a class="btn btn--small btn--primary" href="{% url 'projects:member_add' project.public_id %}">Mitglied hinzufügen</a>{% else %}<span class="card__hint">nur lesen</span>{% endif %}
+    </div>
+    <div class="table-wrap table-wrap--cards">
+      <table class="table table--cards">
+        <caption class="sr-only">Mitglieder mit Projektrollen</caption>
+        <thead><tr><th scope="col">Person</th><th scope="col">Rollen</th>{% if can_manage_members %}<th scope="col"><span class="sr-only">Aktionen</span></th>{% endif %}</tr></thead>
+        <tbody>
+          {% for m in members %}
+          <tr>
+            <td data-label="Person">
+              <span class="person-inline"><span class="avatar{% if m.user.pk == user.pk %} is-me{% endif %}" aria-hidden="true">{{ m.user|initials }}</span>
+              <span>{{ m.user.display_name }}<span class="table__sub">{{ m.user.email }}</span></span></span>
+            </td>
+            <td data-label="Rollen"><span class="chips">{% for role in m.roles %}<span class="chip {{ role|role_tone }}">{{ role.label }}</span>{% endfor %}</span></td>
+            {% if can_manage_members %}
+            <td>
+              <span class="table__actions">
+                <a class="btn btn--small" href="{% url 'projects:member_roles' project.public_id m.membership.pk %}">Rollen ändern</a>
+                <a class="btn btn--small btn--danger" href="{% url 'projects:member_remove' project.public_id m.membership.pk %}">Entfernen</a>
+              </span>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static px %}
+{% block body %}
+  <a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+  <header class="app-header">
+    <a class="wordmark" href="{% url 'projects:list' %}" aria-label="Projekt X – zur Projektübersicht">
+      <img class="wordmark__logo" src="{% static 'img/logo-projekt-x.webp' %}" alt="Projekt X" width="2000" height="667">
+    </a>
+
+    {% if is_dev_environment %}<span class="dev-hint" title="DEBUG ist aktiv">Entwicklungsumgebung</span>{% endif %}
+
+    {% include "partials/theme_toggle.html" %}
+
+    {% if user.is_authenticated %}
+      <div class="current-user">
+        <span class="avatar avatar--lg is-me" aria-hidden="true">{{ user|initials }}</span>
+        <span class="current-user__text">
+          <span>{{ user.display_name }}</span>
+          {% if user.is_admin %}<span class="current-user__role">Administrator</span>{% endif %}
+        </span>
+        <form class="logout-form" method="post" action="{% url 'accounts:logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn--small">Abmelden</button>
+        </form>
+      </div>
+    {% endif %}
+  </header>
+
+  <div class="app-body">
+    <nav class="app-nav" aria-label="Hauptnavigation">
+      <ul class="app-nav__list">
+        <li>
+          <span class="app-nav__item is-disabled" aria-disabled="true" title="Mein Arbeitsplatz folgt in V07b">
+            <svg class="app-nav__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            <span class="app-nav__label">Mein Arbeitsplatz <span class="app-nav__later">folgt in V07b</span></span>
+          </span>
+        </li>
+        <li>
+          <a class="app-nav__item" href="{% url 'projects:list' %}"{% if request.resolver_match.namespace == "projects" %} aria-current="page"{% endif %}>
+            <svg class="app-nav__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="4" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="4" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="4" y="13" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="13" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+            <span class="app-nav__label">Projekte</span>
+          </a>
+        </li>
+        <li>
+          <span class="app-nav__item is-disabled" aria-disabled="true" title="Management folgt später">
+            <svg class="app-nav__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 19V11M10 19V6M15 19v-5M20 19V9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span class="app-nav__label">Management <span class="app-nav__later">folgt später</span></span>
+          </span>
+        </li>
+        <li>
+          <span class="app-nav__item is-disabled" aria-disabled="true" title="Administration folgt später">
+            <svg class="app-nav__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span class="app-nav__label">Administration <span class="app-nav__later">folgt später</span></span>
+          </span>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="main" class="app-main" tabindex="-1">
+      {% if messages %}
+        <ul class="messages" role="status">
+          {% for message in messages %}
+            <li class="message{% if message.tags %} message--{{ message.tags }}{% endif %}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+{% endblock %}

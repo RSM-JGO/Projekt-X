@@ -1,0 +1,15 @@
+{% extends "app_base.html" %}
+{% block title %}Kein Zugriff{% endblock %}
+{% block content %}
+<div class="empty-state">
+  <span class="empty-state__icon" aria-hidden="true">!</span>
+  {% if exception == "Kein Zugriff auf dieses Projekt" %}
+    <h1>Kein Zugriff auf dieses Projekt</h1>
+    <p class="muted">Du bist kein aktives Mitglied dieses Projekts. Die Projektleitung kann dich hinzufügen.</p>
+  {% else %}
+    <h1>Keine Berechtigung</h1>
+    <p class="muted">Für diese Aktion fehlt die nötige Rolle.</p>
+  {% endif %}
+  <a class="btn" href="{% url 'projects:list' %}">Zur Projektübersicht</a>
+</div>
+{% endblock %}
