@@ -20,7 +20,8 @@ Der Benutzer soll die Entwicklung nach abgeschlossener Einrichtung direkt in Cla
 - Präzisiertes Zielbild des Benutzers: Das MVP hat eine lokale Umgebung **und** eine Möglichkeit, dass andere es von außen ansehen; später folgt der Umzug auf eine Umgebung des Arbeitgebers.
 - Installationsliste zur Freigabe: docs/installationsliste-windows.md (uv, von uv verwaltetes Python 3.13, PostgreSQL 18). Noch **nicht freigegeben, nichts installiert**.
 
-- **Lokale Umgebung eingerichtet (21.10.2026):** uv 0.13.4, Python 3.13.16 und PostgreSQL 18.6 mit Rolle `projektx` und Datenbank `projektx_dev`, nur über `localhost` erreichbar. Nachweise in docs/einrichtungsstand.md. Ein Django-Start ist noch nicht nachgewiesen.
+- **Lokale Umgebung eingerichtet (21.10.2026):** uv 0.13.4, Python 3.13.16 und PostgreSQL 18.6 mit Rolle `projektx` und Datenbank `projektx_dev`, nur über `localhost` erreichbar. Nachweise in docs/einrichtungsstand.md.
+- **Django-Grundgerüst (21.10.2026):** Django 5.2 LTS mit eigenem Benutzermodell und Gesundheitsendpunkt, verbunden mit `projektx_dev`. Migrationen, `check`, 6 Tests, `ruff` und der Start über Waitress sind nachgewiesen (docs/einrichtungsstand.md). Noch ohne Oberfläche und Anmeldung.
 - **Designvorschau (V06, Auftrag docs/auftrag-erster-prototyp.md) erstellt:** design/ (index.html, styles.css, app.js, data.js, README.md). Gebaut vom developer, Kurzreview durch reviewer; dessen vier Befunde sind behoben. Lokal zu öffnen per Doppelklick auf design/index.html oder über die Vorschau-Konfiguration `designvorschau` in .claude/launch.json (http://127.0.0.1:8123, nur lokal).
   - **Im Browser durch den Hauptdialog geprüft:** Navigation; Hell, Dunkel und Speicherung nach Neuladen; Abschließen und Wiederöffnen von „Filialtermine mit Regionalleitung bestätigen“ mit gleichem Zustand in Projekt und Arbeitsplatz; Filter Offen/Erledigt/Alle; Verlaufseinträge; Management mit Plan/Prognose-Abweichung; veraltete Berichte werden neutral statt grün dargestellt; unbekannte Projekt-Adressen zeigen einen Leerzustand; bei 375 px Breite keine horizontale Überbreite, untere Navigation und Detailpanel bedienbar; keine Konsolenfehler.
   - **Nicht geprüft:** gemessene Kontrastwerte, Screenreader, vollständige Tastaturbedienung, Darstellung auf Tablet-Breite und in anderen Browsern.
@@ -35,8 +36,13 @@ Der Benutzer soll die Entwicklung nach abgeschlossener Einrichtung direkt in Cla
 ## Nächster Auftrag
 
 1. Der zentrale Claude-Chat „Projektleitung und Rollenüberblick“ übernimmt ab jetzt den Single Point of Contact. Die acht Rollen sind eingerichtet und nachgewiesen.
-2. Jetzt den beauftragten Auftrag docs/auftrag-erster-prototyp.md ausführen: klickbare Designvorschau (V06) lokal erstellen, Projekt X mit Pastellakzenten, Hell/Dunkel und Beispieldaten. Kein weiterer Server- oder Gesamtplanungsblock davor. Umsetzung noch nicht gestartet; die Vorbereitung allein ist kein funktionierender Prototyp.
-3. Nach Feedback Gestaltung festhalten; native Windows-Python-/PostgreSQL-Umgebung einrichten und ersten kleinen echten Ablauf mit Django umsetzen und prüfen. Keine erneute Gesamtplanung.
+2. Erledigt: Designvorschau (V06) mit Logo und Farbregeln; lokale Umgebung; Django-Grundgerüst. Der Aufbau des Arbeitsplatzes wird später überarbeitet (Wunsch des Benutzers).
+3. Als Nächstes: erster echter Ablauf (V07) mit Anmeldung, Projekten und gemeinsamen Aufgaben, mit Rechten und Tests. Vorher beim Benutzer klären:
+   - Darf der Administrator Aufgaben korrigieren?
+   - Dürfen persönliche Aufgaben geteilt werden?
+   - Werden Zeiträume für Arbeitspakete gebraucht?
+   - Muss die E-Mail-Adresse eindeutig sein?
+   Die Oberfläche folgt den Regeln in docs/styleguide-briefing.md.
 4. Der virtuelle Windows-Server kommt erst beim späteren Umzug von privater Entwicklung in berufliche Nutzung. Serverversion, Hosting und konkrete produktive Pipeline blockieren die lokale Entwicklung nicht. Keine WSL-/Linux-Installation.
 
 ## Offen

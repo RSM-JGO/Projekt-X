@@ -17,6 +17,10 @@ coverage/
 test-results/
 playwright-report/
 .venv/
+staticfiles/
+media/
+.pytest_cache/
+.ruff_cache/
 __pycache__/
 *.log
 

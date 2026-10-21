@@ -20,4 +20,20 @@ Vorbereitungsstand vom 21. Oktober 2026. Noch keine Anwendungsimplementierung.
 14. `docs/entwurf-windows-betrieb.md`: Windows-Entwicklung, Windows-Betrieb, Pipeline und externe Demo (Revision 3, Entwurf).
 15. `docs/installationsliste-windows.md`: Lokale Installationen zur Freigabe durch den Benutzer.
 
-Der lokale Ordner ist die Arbeitskopie. Das private GitHub-Repository https://github.com/jago1698/projektmanagement-software ist erstellt und als origin verbunden. Die Grundvorbereitung ist hochgeladen. Claude kann die Unterlagen lesen und bestätigt alle acht geladenen Rollen einschließlich Projektleitung und Releasemanager. Server, Domain, Datenbank, E-Mail-Dienst und Deployment-Pipeline sind noch nicht eingerichtet. Aktueller Arbeitsstand: docs/arbeitsstand.md.
+Der lokale Ordner ist die Arbeitskopie. Das private GitHub-Repository https://github.com/jago1698/projektmanagement-software ist erstellt und als origin verbunden. Die Grundvorbereitung ist hochgeladen. Claude kann die Unterlagen lesen und bestätigt alle acht geladenen Rollen einschließlich Projektleitung und Releasemanager. Lokal eingerichtet sind Python 3.13 (über uv), PostgreSQL 18 und ein Django-5.2-Grundgerüst ohne Oberfläche (Nachweise in docs/einrichtungsstand.md). Server, Domain, E-Mail-Dienst und Deployment-Pipeline sind noch nicht eingerichtet. Aktueller Arbeitsstand: docs/arbeitsstand.md.
+
+## Lokale Entwicklung (Windows, PowerShell)
+
+Voraussetzungen: uv, Python 3.13 über uv, PostgreSQL 18 mit Rolle `projektx` und Datenbank `projektx_dev`. Außerdem eine ausgefüllte `.env` nach dem Muster von `.env.example`.
+
+| Zweck | Befehl |
+| --- | --- |
+| Pakete installieren | `uv sync` |
+| Datenbank migrieren | `uv run python manage.py migrate` |
+| Entwicklungsserver | `uv run python manage.py runserver` |
+| Start über Waitress | `$env:PYTHONPATH='src'; uv run waitress-serve --listen=127.0.0.1:8000 config.wsgi:application` |
+| Tests | `uv run pytest` |
+| Codeprüfung | `uv run ruff check` und `uv run ruff format --check` |
+| Fehlende Migrationen | `uv run python manage.py makemigrations --check --dry-run` |
+
+Gesundheitsprüfung: http://127.0.0.1:8000/health/

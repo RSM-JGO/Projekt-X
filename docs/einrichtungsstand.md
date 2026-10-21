@@ -70,7 +70,26 @@ Claudes Einrichtungsbericht wurde teilweise vor dem ersten Commit erstellt. Sein
   - `.env.example` (versioniert, nur Platzhalter) und `.env` (laut `git check-ignore` ignoriert) sind angelegt. Der Benutzer trägt `DB_PASSWORD` selbst ein.
   - **Anmeldetest am 21.10.2026 erfolgreich:** Claude hat sich mit den Werten aus `.env` als `projektx` an `projektx_dev` angemeldet. Das Passwort wurde über eine Umgebungsvariable übergeben, die danach gelöscht wurde; es wurde nicht angezeigt.
     - Ergebnis: `current_user=projektx`, `current_database=projektx_dev`, Superuser `f`, CREATEDB `t`, Server 18.6, Verbindung über `::1`.
-    - Lokale Python- und Datenbankumgebung damit eingerichtet. Offen ist noch der Nachweis mit einem Django-Projekt (Migration, Testanfrage, Test, Waitress); siehe `docs/entwurf-windows-betrieb.md` Abschnitt 2.
+    - Lokale Python- und Datenbankumgebung damit eingerichtet.
+
+## Django-Grundgerüst (Freigabe des Benutzers vom 21.10.2026)
+
+- Pakete nur in `.venv` des Projekts per `uv sync`: Django 5.2.18 (LTS), psycopg 3.3.6 (binary), waitress 3.0.2, python-dotenv 1.2.4; zum Entwickeln pytest 9.1.1, pytest-django 4.14.0, ruff 0.17.1. Versionen gesperrt in `uv.lock`. `.venv\pyvenv.cfg` verweist auf `C:\Users\jango\.uv\python\…`, also nicht auf den virtualisierten Claude-Ordner.
+- Aufbau:
+  - `pyproject.toml` und `manage.py` im Projektordner;
+  - `src/config` mit den Einstellungen; alle umgebungsabhängigen Werte kommen aus `.env`;
+  - `src/apps/core` mit dem Gesundheitsendpunkt `/health/`;
+  - `src/apps/accounts` mit dem eigenen Benutzermodell `accounts.User`, von Anfang an angelegt;
+  - `tests/`.
+- `.env` wurde um `DJANGO_SECRET_KEY` (lokal zufällig erzeugt, nicht angezeigt), `DJANGO_DEBUG=1` und `DJANGO_ALLOWED_HOSTS` ergänzt. `.env.example` enthält dafür nur Platzhalter.
+- **Nachweis am 21.10.2026:**
+  - `manage.py migrate` hat alle Migrationen auf `projektx_dev` angewendet, einschließlich `accounts.0001_initial`.
+  - `manage.py check` meldet keine Probleme; `makemigrations --check` meldet keine fehlenden Migrationen.
+  - `pytest`: 6 Tests bestanden, gegen PostgreSQL. Geprüft werden der Gesundheitsendpunkt (Erfolg sowie Ausfall mit 503 ohne Fehlerdetails), nur GET, die Datenbank ist PostgreSQL, das Benutzermodell und das Speichern eines Benutzers.
+  - Kurzreview durch reviewer: keine harten Fehler. Umgesetzt wurden weitere `.gitignore`-Einträge, eine Ablehnung von Platzhalter oder zu kurzem `DJANGO_SECRET_KEY`, ein Protokolleintrag bei Datenbankausfall im Gesundheitsendpunkt und ein Test für den 503-Fall. Offen sind die Sicherheitseinstellungen für den Betrieb (sichere Cookies, `CSRF_TRUSTED_ORIGINS`, Proxy-Header, HSTS), spätestens vor Demo oder Prod, und die Produktfrage, ob die E-Mail-Adresse eindeutig sein muss.
+  - `ruff check` und `ruff format --check` sind sauber.
+  - Über Waitress (`127.0.0.1:8001`) antwortet `/health/` mit HTTP 200 `{"status": "ok", "database": "ok"}`, eine unbekannte Adresse mit 404. Der Server wurde danach beendet.
+- Noch nicht vorhanden: Anmeldung, Oberfläche, fachliche Module, CI.
 
 ## Noch offen
 
