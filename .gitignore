@@ -25,6 +25,7 @@ __pycache__/
 *.log
 
 # Laufzeitdaten und interne Quellen
+run/
 uploads/
 storage/
 backups/

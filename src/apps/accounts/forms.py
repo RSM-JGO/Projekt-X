@@ -14,7 +14,9 @@ class EmailAuthenticationForm(AuthenticationForm):
     password = forms.CharField(
         label="Passwort",
         strip=False,
-        widget=forms.PasswordInput(attrs={"autocomplete": "current-password"}),
+        widget=forms.PasswordInput(
+            attrs={"autocomplete": "current-password", "data-password-toggle": ""}
+        ),
     )
 
     error_messages = {

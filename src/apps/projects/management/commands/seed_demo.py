@@ -13,10 +13,11 @@ from apps.tasks.models import Bucket, Task
 from apps.tasks.selectors import today
 
 # Beispieldaten: klar gekennzeichnet, nicht zustellbare Domain (.invalid, RFC 2606)
+# Einziges Konto mit Administratorrechten ist das ausdrücklich benannte Vorführkonto admin@.
 DEMO_USERS = {
     "admin": {
         "email": "admin@beispiel.invalid",
-        "display_name": "Alex Admin (Beispiel)",
+        "display_name": "Alex Admin – Vorführkonto Administrator (Beispiel)",
         "is_admin": True,
     },
     "pl": {
@@ -83,8 +84,13 @@ class Command(BaseCommand):
     help = "Lädt gekennzeichnete Beispielkonten und -projekte (nur mit DEBUG, mehrfach ausführbar)."
 
     def handle(self, *args, **options):
-        if not settings.DEBUG:
-            raise CommandError("seed_demo ist nur in der Entwicklungsumgebung (DEBUG=1) erlaubt.")
+        instance = getattr(settings, "PX_INSTANCE", "dev")
+        if instance == "prod":
+            raise CommandError("seed_demo ist in der Instanz prod immer gesperrt.")
+        if not (settings.DEBUG or instance == "demo"):
+            raise CommandError(
+                "seed_demo ist nur in der Entwicklung (DEBUG=1) oder in der Instanz demo erlaubt."
+            )
         password = os.environ.get("DEMO_PASSWORD", "")
         if not password or password == "HIER_EINTRAGEN":
             raise CommandError("Umgebungsvariable DEMO_PASSWORD fehlt (siehe .env.example).")

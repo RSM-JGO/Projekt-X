@@ -54,7 +54,7 @@ Der Benutzer soll die Entwicklung nach abgeschlossener Einrichtung direkt in Cla
    - Zuständige ändern nur Projektleiter und Administrator; die Empfehlung wurde umgesetzt, 478 Tests grün. Mitarbeiter dürfen Titel, Beschreibung, Fälligkeit und Bucket ändern.
    - **Offen:** kein Status „In Arbeit“ und keine Priorität (beides für Etappe 5 bestätigt); Buckets lassen sich nicht archivieren; ältere Dev-Verlaufseinträge zeigen noch E-Mail statt Namen.
    - **V07b vom Benutzer am 21.10.2026 abgenommen.**
-5. **Nächste Etappe 3, externe Demo:** Auftrag in docs/auftrag-demo-ansicht.md (Vorschlag). Wartet auf drei Benutzerfreigaben: Tunnel-Anbieter (Empfehlung Microsoft Dev Tunnels), Paket whitenoise und eine eigene Demo-Datenbank. Etappe 2 (Arbeitsplatz) wartet auf das Feedback des Benutzers zur echten Version.
+5. **Etappe 3, externe Demo (inkl. F16 Versionsanzeige), umgesetzt** (21.10.2026). Nachweise in docs/auftrag-demo-ansicht.md. Start und Stopp mit `scriptsdemo.ps1 start|stop`, öffentliche Adresse https://vflm0d5d-8100.eun1.devtunnels.ms. **Vom Benutzer am 21.10.2026 abgenommen.** Neue Backlog-Wünsche: F17 Monitoring, F18 Logo-Animation, F19 Journey und Menüstruktur, F20 Stakeholder, F21 RACI, F11 Risiko-Matrix.
 4. Der virtuelle Windows-Server kommt erst beim späteren Umzug von privater Entwicklung in berufliche Nutzung. Serverversion, Hosting und konkrete produktive Pipeline blockieren die lokale Entwicklung nicht. Keine WSL-/Linux-Installation.
 
 ## Offen

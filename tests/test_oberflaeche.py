@@ -40,3 +40,31 @@ def test_startseite_leitet_auf_projektuebersicht(client, welt):
     response = client.get("/")
     assert response.status_code == 302
     assert response.url == reverse("projects:list")
+
+
+@pytest.mark.django_db
+def test_passwortfeld_mit_umschalter_ohne_inline_script(client):
+    html = client.get(reverse("accounts:login")).content.decode()
+    assert 'type="password"' in html and "data-password-toggle" in html
+    assert "js/password-toggle.js" in html
+    # Der Umschalter wird erst per JavaScript eingefügt; ohne JS bleibt das Feld normal
+    assert "password-toggle__text" not in html
+    assert "<script>" not in html and "onclick" not in html
+
+
+def test_umschalter_skript_barrierearm():
+    from django.contrib.staticfiles import finders
+
+    path = finders.find("js/password-toggle.js")
+    assert path
+    js = open(path, encoding="utf-8").read()
+    for merkmal in (
+        'button.type = "button"',
+        "aria-pressed",
+        "aria-label",
+        "aria-controls",
+        "Anzeigen",
+        "Verbergen",
+        '"text" : "password"',
+    ):
+        assert merkmal in js

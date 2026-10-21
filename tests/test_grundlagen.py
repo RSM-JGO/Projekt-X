@@ -3,12 +3,20 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import connection
 
+from apps.core.version import version_info
+
 
 @pytest.mark.django_db
 def test_health_meldet_erreichbare_datenbank(client):
     response = client.get("/health/")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "database": "ok"}
+    assert response.json() == {
+        "status": "ok",
+        "database": "ok",
+        "version": "0.1.0",
+        "commit": version_info()["commit"],
+        "instance": "dev",
+    }
 
 
 @pytest.mark.django_db
@@ -19,7 +27,10 @@ def test_health_meldet_ausfall_ohne_details(client, monkeypatch):
     monkeypatch.setattr("apps.core.views.connection.cursor", kaputt)
     response = client.get("/health/")
     assert response.status_code == 503
-    assert response.json() == {"status": "error", "database": "error"}
+    data = response.json()
+    assert (data["status"], data["database"]) == ("error", "error")
+    assert set(data) == {"status", "database", "version", "commit", "instance"}
+    assert "geheim" not in response.content.decode()
 
 
 def test_health_erlaubt_nur_get(client):

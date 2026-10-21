@@ -39,3 +39,18 @@ Voraussetzungen: uv, Python 3.13 über uv, PostgreSQL 18 mit Rolle `projektx` un
 | Beispieldaten laden: Konten, Projekte, Buckets, Aufgaben (nur mit `DJANGO_DEBUG=1`, Passwort aus `DEMO_PASSWORD`, mehrfach ausführbar) | `uv run python manage.py seed_demo` |
 
 Gesundheitsprüfung: http://127.0.0.1:8000/health/
+
+## Externe Demo (Etappe 3, nur Beispieldaten)
+
+Vorbereitung einmalig: Datenbank `projektx_demo` mit eigener Rolle `projektx_demo` anlegen (ohne Rechte auf `projektx_dev`), `.env.demo` nach `.env.demo.example` ausfüllen, `devtunnel` installieren, anmelden und einen Tunnel für Port 8100 anlegen; dessen ID als `PX_TUNNEL_ID` eintragen. Tunneladresse in `DJANGO_ALLOWED_HOSTS` und `CSRF_TRUSTED_ORIGINS` eintragen.
+
+| Zweck | Befehl |
+| --- | --- |
+| Demo starten (migrate, collectstatic, `check --deploy`, Waitress auf 127.0.0.1:8100, Tunnel) | `powershell -ExecutionPolicy Bypass -File scripts\demo.ps1 start` |
+| Beispieldaten laden (nur Instanz demo) | `powershell -ExecutionPolicy Bypass -File scripts\demo.ps1 seed` |
+| Status anzeigen | `powershell -ExecutionPolicy Bypass -File scripts\demo.ps1 status` |
+| Demo stoppen (Tunnel und Waitress) | `powershell -ExecutionPolicy Bypass -File scripts\demo.ps1 stop` |
+
+Hinweise: `/admin` ist in der Demo nicht eingebunden. Einziges Konto mit Administratorrechten ist das Vorführkonto `admin@beispiel.invalid`. Statische Dateien (Gestaltung, Logo) sind ohne Anmeldung abrufbar, weil die Anmeldeseite sie braucht; sie enthalten keine Projektdaten. Annahme, vor der Freigabe zu prüfen: Der Dev-Tunnel setzt `X-Forwarded-For` und `X-Forwarded-Proto`. Fehlt `X-Forwarded-Proto`, entsteht eine Weiterleitungsschleife; dann `PX_SSL_REDIRECT=0` setzen (begründete Ausnahme zu `security.W008`). Protokolle liegen in `run\`.
+
+Versionsanzeige: Fußzeile jeder angemeldeten Seite und `/health/` zeigen Version (aus `pyproject.toml`), Commit und Instanz.

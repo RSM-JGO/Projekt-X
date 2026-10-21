@@ -65,3 +65,31 @@ class LoginLockoutHandler(AxesDatabaseHandler):
                 username=lockout_username(request, credentials),
                 ip_address=request.axes_ip_address,
             )
+
+
+LOOPBACK = {"127.0.0.1", "::1"}
+
+
+def client_ip(request):
+    """Client-IP für die Sperre nach Fehlversuchen.
+
+    Ohne PX_BEHIND_PROXY gilt REMOTE_ADDR. Mit PX_BEHIND_PROXY=1 und einer Verbindung vom
+    lokalen Rechner (der Tunnel-Client verbindet sich mit Waitress auf 127.0.0.1) gilt der
+    letzte Eintrag in X-Forwarded-For: Den hängt der Tunnel-Proxy an, frühere Einträge kann
+    der Besucher selbst fälschen (ein vertrauenswürdiger Proxy, Zählung von rechts).
+    Annahme (vor der Freigabe prüfen): Microsoft Dev Tunnels setzt X-Forwarded-For und
+    X-Forwarded-Proto.
+    """
+    import ipaddress
+
+    from django.conf import settings
+
+    remote = request.META.get("REMOTE_ADDR")
+    if not getattr(settings, "PX_BEHIND_PROXY", False) or remote not in LOOPBACK:
+        return remote
+    forwarded = request.META.get("HTTP_X_FORWARDED_FOR", "")
+    candidate = forwarded.split(",")[-1].strip() if forwarded else ""
+    try:
+        return str(ipaddress.ip_address(candidate))
+    except ValueError:
+        return remote

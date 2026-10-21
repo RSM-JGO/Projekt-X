@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import RedirectView
@@ -10,5 +11,8 @@ urlpatterns = [
     path("", include("apps.accounts.urls")),
     path("projekte/", include("apps.projects.urls")),
     path("", include("apps.tasks.urls")),
-    path("admin/", admin.site.urls),
 ]
+
+# Technische Oberfläche /admin nur in der Entwicklung; in Demo und Prod nicht geroutet
+if settings.PX_INSTANCE == "dev":
+    urlpatterns.append(path("admin/", admin.site.urls))

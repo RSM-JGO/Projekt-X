@@ -66,6 +66,7 @@
         </ul>
       {% endif %}
       {% block content %}{% endblock %}
+      {% if version_label %}<footer class="app-footer"><span class="version-info" title="{{ version_tooltip }}">{{ version_label }}<span class="sr-only"> ({{ version_tooltip }})</span></span></footer>{% endif %}
     </main>
   </div>
 {% endblock %}
