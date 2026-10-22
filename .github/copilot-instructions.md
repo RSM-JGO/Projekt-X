@@ -1,0 +1,1 @@
+Dieses Projekt (Projekt X) hat verbindliche Arbeitsregeln in `CLAUDE.md` und einen Einstieg für KI-Assistenten in `AGENTS.md`. Lies beide zuerst und befolge sie. Antworte auf Deutsch. Aktueller Stand: `docs/arbeitsstand.md`; Befehle: `README.md`.
