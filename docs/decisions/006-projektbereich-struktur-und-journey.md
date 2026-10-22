@@ -34,3 +34,10 @@ Datum: 22. Oktober 2026. Status: **beschlossen** durch den Benutzer („Version 
 - Die bestehende Projektdetailseite und das Bucket-Board aus V07b werden durch diese Struktur ersetzt bzw. umgebaut.
 
 Betroffen: F19 (erledigt als Konzept), F11, F20, F21, Etappen 4 bis 8.
+
+## Ergänzende Entscheidungen des Benutzers (22.10.2026)
+
+Der Benutzer hat die Empfehlungen des Projektleiters übernommen:
+1. Eine **Freigabe ohne alle Pflichtdokumente ist möglich**, zeigt aber eine **deutliche Warnung**; fehlende Pflichtdokumente werden an der Freigabe vermerkt. Es gibt keine Blockade.
+2. **Meilensteine sind je Projekt anpassbar.** Standard ist M0–M5; Meilensteine lassen sich je Projekt ergänzen und ausblenden.
+3. **Reihenfolge:** zuerst das Datenmodell-Konzept, dann Etappe 4a (Projektnavigation, Meilensteine, Termine).

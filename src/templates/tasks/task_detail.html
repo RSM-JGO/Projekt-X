@@ -5,7 +5,7 @@
 <div class="page-head">
   <div class="page-head__text">
     <p class="breadcrumb">
-      {% if task.project %}<a href="{% url 'projects:list' %}">Projekte</a> / <a href="{% url 'projects:detail' task.project.public_id %}">{{ task.project.name }}</a> / {{ task.bucket.name }}
+      {% if task.project %}<a href="{% url 'projects:list' %}">Projekte</a> / <a href="{% url 'projects:detail' task.project.public_id %}">{{ task.project.name }}</a> / <a href="{% url 'tasks:board' task.project.public_id %}">Aufgaben</a> / {{ task.bucket.name }}
       {% else %}<a href="{% url 'tasks:workplace' %}">Mein Arbeitsplatz</a> / Persönliche Aufgabe{% endif %}
     </p>
     <h1>{{ task.title }}</h1>

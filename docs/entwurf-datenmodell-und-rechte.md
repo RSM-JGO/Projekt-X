@@ -112,7 +112,7 @@ G = gilt global, P = nur in Projekten, in denen die Person Mitglied mit dieser P
 
 Erläuterungen:
 
-- Freigaben erteilt laut Produktgrundlage nur der Projektleiter. Der Admin bekommt deshalb bewusst **kein** Freigaberecht.
+- Freigaben erteilt laut Produktgrundlage nur der Projektleiter. Der Admin bekommt deshalb bewusst **kein** Freigaberecht. *Überholt durch Entscheidung 004.*
 - Persönliche Aufgaben ohne Projekt sieht nur die Person, die sie angelegt hat, auch der Admin nicht.
 - Fachliche Stakeholder sind nicht automatisch Benutzer.
 - Die globale Rolle „Projektleiter“ erlaubt das Anlegen von Projekten; was jemand in einem Projekt darf, bestimmt die Projektrolle der Mitgliedschaft.

@@ -1,0 +1,5 @@
+{% if s.rating.label == "nicht bewertet" %}
+<p class="j-progress">{% include "partials/marker.html" with m=s.rating text=True %}<span class="j-progress__text">{% if not s.total %}keine Lieferobjekte{% else %}{{ s.present }} von {{ s.total }} Lieferobjekten, noch ohne Termin{% endif %}</span></p>
+{% else %}
+<p class="j-progress"><span class="j-progress__bar" aria-hidden="true"><span class="j-progress__fill" style="width:{{ s.percent }}%"></span></span><span class="j-progress__text">{{ s.present }} von {{ s.total }} Lieferobjekten vorhanden</span></p>
+{% endif %}

@@ -2,10 +2,14 @@
 {% load px %}
 {% block title %}{{ project.name }}{% endblock %}
 {% block content %}
+{% include "projects/_project_head.html" with nav=project_nav %}
 <div class="page-head">
   <div class="page-head__text">
-    <p class="breadcrumb"><a href="{% url 'projects:list' %}">Projekte</a></p>
     <h1>{{ project.name }}</h1>
+    <p class="page-head__meta">
+      {{ project.start_date|date:"d.m.Y" }} – {{ project.end_date|date:"d.m.Y" }}
+      · Projektleitung: {% for lead in cockpit.leads %}{{ lead.display_name }}{% if not forloop.last %}, {% endif %}{% empty %}keine{% endfor %}
+    </p>
     <p class="page-head__meta">
       {% if my_roles %}Deine Rollen:
         {% for role in my_roles %}<span class="chip {{ role|role_tone }}">{{ role.label }}</span> {% endfor %}
@@ -17,51 +21,80 @@
   {% endif %}
 </div>
 
-<div class="card-grid">
-  <section class="card" aria-labelledby="steckbrief-title">
-    <div class="card__head"><h2 id="steckbrief-title">Steckbrief</h2><span class="card__hint">Kurzinfo</span></div>
-    <dl class="facts">
-      <div><dt>Beginn</dt><dd>{{ project.start_date|date:"d.m.Y" }}</dd></div>
-      <div><dt>Ende</dt><dd>{{ project.end_date|date:"d.m.Y" }}</dd></div>
-      <div><dt>Projektleitung</dt><dd>{% for lead in leads %}{{ lead.display_name }}{% if not forloop.last %}, {% endif %}{% empty %}<span class="muted">keine</span>{% endfor %}</dd></div>
-      <div><dt>Mitglieder</dt><dd>{{ members|length }}</dd></div>
-      <div><dt>Angelegt</dt><dd>{{ project.created_at|date:"d.m.Y" }} von {{ project.created_by.display_name }}</dd></div>
-    </dl>
-    {% if project.description %}<p class="description">{{ project.description }}</p>{% endif %}
+<div class="j-grid j-grid--2">
+  <section class="card j-phase" aria-labelledby="ph-title">
+    <p class="j-next__label">Aktueller Abschnitt</p>
+    {% if current %}
+      <h2 id="ph-title">{{ current.number }}. {{ current.milestone.phase_name }}</h2>
+      <p class="muted">Nächster Meilenstein <strong>{{ current.milestone.label }}</strong>
+        {% if current.forecast_date %}· Prognose {{ current.forecast_date|date:"d.m.Y" }}{% elif current.planned_date %}· Plan {{ current.planned_date|date:"d.m.Y" }}{% else %}· noch ohne Termin{% endif %}</p>
+      {% include "milestones/_progress.html" with s=current %}
+      <a class="btn btn--small" href="{{ current.url }}">Lieferobjekte für {{ current.milestone.code }}</a>
+    {% else %}
+      <h2 id="ph-title">Alle Meilensteine freigegeben</h2>
+      <p class="muted">Kein sichtbarer Meilenstein ist mehr offen.</p>
+    {% endif %}
   </section>
 
-  <section class="card" aria-labelledby="mitglieder-title">
-    <div class="card__head">
-      <h2 id="mitglieder-title">Mitglieder</h2>
-      {% if can_manage_members %}<a class="btn btn--small btn--primary" href="{% url 'projects:member_add' project.public_id %}">Mitglied hinzufügen</a>{% else %}<span class="card__hint">nur lesen</span>{% endif %}
-    </div>
-    <div class="table-wrap table-wrap--cards">
-      <table class="table table--cards">
-        <caption class="sr-only">Mitglieder mit Projektrollen</caption>
-        <thead><tr><th scope="col">Person</th><th scope="col">Rollen</th>{% if can_manage_members %}<th scope="col"><span class="sr-only">Aktionen</span></th>{% endif %}</tr></thead>
-        <tbody>
-          {% for m in members %}
-          <tr>
-            <td data-label="Person">
-              <span class="person-inline"><span class="avatar{% if m.user.pk == user.pk %} is-me{% endif %}" aria-hidden="true">{{ m.user|initials }}</span>
-              <span>{{ m.user.display_name }}<span class="table__sub">{{ m.user.email }}</span></span></span>
-            </td>
-            <td data-label="Rollen"><span class="chips">{% for role in m.roles %}<span class="chip {{ role|role_tone }}">{{ role.label }}</span>{% endfor %}</span></td>
-            {% if can_manage_members %}
-            <td>
-              <span class="table__actions">
-                <a class="btn btn--small" href="{% url 'projects:member_roles' project.public_id m.membership.pk %}">Rollen ändern</a>
-                <a class="btn btn--small btn--danger" href="{% url 'projects:member_remove' project.public_id m.membership.pk %}">Entfernen</a>
-              </span>
-            </td>
-            {% endif %}
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+  <section class="card j-next" aria-labelledby="ns-title">
+    <p class="j-next__label">Vorschlag, keine Pflicht</p>
+    <h2 id="ns-title">Nächste Schritte</h2>
+    {% if cockpit.steps %}
+      <ol class="j-steps">
+        {% for step in cockpit.steps %}
+          <li><a href="{{ step.url }}">{{ step.title }}</a>{% if step.text %}<span class="muted"> – {{ step.text }}</span>{% endif %}</li>
+        {% endfor %}
+      </ol>
+      {% if cockpit.steps_total > cockpit.steps|length %}<p class="small muted">und {{ cockpit.steps_total|add:"-5" }} weitere</p>{% endif %}
+    {% else %}
+      <p class="muted">Keine offenen Lieferobjekte im aktuellen Meilenstein.</p>
+    {% endif %}
   </section>
 </div>
 
-{% include "tasks/_board.html" %}
+<div class="j-grid j-grid--4">
+  <section class="card j-kpi" aria-labelledby="kpi-termine">
+    <h2 id="kpi-termine">Nächste Termine</h2>
+    {% if cockpit.upcoming %}
+      <ul class="j-kpi__list">
+        {% for s in cockpit.upcoming %}<li><strong>{{ s.milestone.code }}</strong> {{ s.milestone.title }}<span class="muted"> · {{ s.date|date:"d.m.Y" }}</span></li>{% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted j-kpi__sub">Keine anstehenden Termine. Meilensteine ohne Termin gelten als nicht bewertet.</p>
+    {% endif %}
+    <a class="j-kpi__link" href="{% url 'milestones:schedule' project.public_id %}">Termine & Zeitstrahl</a>
+  </section>
+
+  <section class="card j-kpi" aria-labelledby="kpi-freigaben">
+    <h2 id="kpi-freigaben">Offene Freigaben</h2>
+    <p class="j-kpi__value">{{ cockpit.open_approvals_count }}</p>
+    <ul class="j-kpi__list">
+      {% for s in cockpit.open_approvals %}<li>{% include "partials/marker.html" with m=s.approval_marker text=False %} <a href="{{ s.url }}">{{ s.milestone.label }}</a></li>{% endfor %}
+    </ul>
+    {% if current %}<a class="j-kpi__link" href="{{ current.url }}">Zum aktuellen Meilenstein</a>{% endif %}
+  </section>
+
+  <section class="card j-kpi" aria-labelledby="kpi-aufgaben">
+    <h2 id="kpi-aufgaben">Aufgaben</h2>
+    <p class="j-kpi__value">{{ cockpit.tasks_open }}<span class="j-kpi__unit"> offen</span></p>
+    <p class="j-kpi__sub">{% if cockpit.tasks_overdue %}<span class="jstate"><span class="jstate__icon tone-rose" aria-hidden="true">!</span><span class="jstate__text">{{ cockpit.tasks_overdue }} überfällig</span></span>{% else %}keine überfällig{% endif %}</p>
+    <a class="j-kpi__link" href="{% url 'tasks:board' project.public_id %}">Zum Board</a>
+  </section>
+
+  <section class="card j-kpi" aria-labelledby="kpi-team">
+    <h2 id="kpi-team">Team</h2>
+    <p class="j-kpi__value">{{ cockpit.members|length }}<span class="j-kpi__unit"> Mitglied{{ cockpit.members|length|pluralize:"er" }}</span></p>
+    <ul class="j-kpi__list">
+      {% for m in cockpit.members %}<li><span class="avatar{% if m.user.pk == user.pk %} is-me{% endif %}" aria-hidden="true">{{ m.user|initials }}</span> {{ m.user.display_name }}</li>{% endfor %}
+    </ul>
+    <a class="j-kpi__link" href="{% url 'projects:team' project.public_id %}">Team & Mitglieder</a>
+  </section>
+</div>
+
+{% if project.description %}
+<section class="card j-block" aria-labelledby="desc-title">
+  <div class="card__head"><h2 id="desc-title">Beschreibung</h2><span class="card__hint">Angelegt {{ project.created_at|date:"d.m.Y" }} von {{ project.created_by.display_name }}</span></div>
+  <p class="description">{{ project.description }}</p>
+</section>
+{% endif %}
 {% endblock %}

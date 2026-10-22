@@ -1,4 +1,4 @@
-{% if field.field.widget.input_type == "checkbox" %}
+{% if field.field.widget.input_type == "checkbox" and field.field.widget.allow_multiple_selected or field.field.widget.input_type == "radio" %}
 <fieldset class="form__row{% if field.errors %} has-error{% endif %}">
   <legend>{{ field.label }}</legend>
   <div class="form__checks">

@@ -1,0 +1,48 @@
+{% extends "app_base.html" %}
+{% block title %}Freigabe {{ milestone.code }} – {{ project.name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div class="page-head__text">
+    <p class="breadcrumb"><a href="{% url 'projects:list' %}">Projekte</a> / <a href="{% url 'projects:detail' project.public_id %}">{{ project.name }}</a> / <a href="{% url 'milestones:detail' project.public_id milestone.public_id %}">{{ milestone.label }}</a></p>
+    <h1>{% if correction %}Freigabe korrigieren{% else %}Freigabe erfassen{% endif %}: {{ milestone.label }}</h1>
+    {% if correction %}<p class="page-head__meta">Die Korrektur wird als neue Freigabe gespeichert und ersetzt die Freigabe vom {{ current.decided_on|date:"d.m.Y" }}. Die bisherige bleibt sichtbar. Die fehlenden Pflichtdokumente werden zum Zeitpunkt der Korrektur neu eingefroren; die Liste der ersetzten Freigabe bleibt unverändert.</p>{% endif %}
+  </div>
+</div>
+
+{% if acts_as_admin %}<p class="note note--admin">Du handelst als Administrator. Die Freigabe wird als Administratoraktion gekennzeichnet und protokolliert.</p>{% endif %}
+
+<section class="card">
+  <form class="form" method="post" novalidate>
+    {% csrf_token %}
+    {% if correction %}<input type="hidden" name="korrektur" value="1">{% endif %}
+    <input type="hidden" name="missing_ids" value="{{ missing_ids }}">
+    {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+
+    {% if missing %}
+    <div class="warning-box" role="alert">
+      <p class="warning-box__title"><span class="jstate__icon tone-peach" aria-hidden="true">!</span> Es fehlen {{ missing|length }} Pflichtdokument{{ missing|length|pluralize:"e" }}</p>
+      <ul class="j-lines">{% for m in missing %}<li>{{ m.title }}</li>{% endfor %}</ul>
+      <p class="small">Eine Freigabe (Grün oder Orange) ist trotzdem möglich. Die Liste wird an der Freigabe eingefroren und bleibt sichtbar, auch wenn die Dokumente später nachgereicht werden.</p>
+      {% include "partials/check.html" with field=form.confirm_missing %}
+    </div>
+    {% endif %}
+
+    {% include "partials/field.html" with field=form.light %}
+    {% include "partials/field.html" with field=form.decision %}
+    <div class="form__row--split">
+      {% include "partials/field.html" with field=form.decided_on %}
+      {% include "partials/field.html" with field=form.valid_until %}
+    </div>
+    {% include "partials/field.html" with field=form.conditions %}
+    {% include "partials/field.html" with field=form.participants %}
+    {% include "partials/field.html" with field=form.external_participants %}
+    {% include "partials/field.html" with field=form.basis %}
+    {% include "partials/field.html" with field=form.plan_version %}
+    <p class="card__hint">Gespeicherte Freigaben lassen sich nicht ändern oder löschen.</p>
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">{% if correction %}Korrektur speichern{% else %}Freigabe speichern{% endif %}</button>
+      <a class="btn btn--ghost" href="{% url 'milestones:detail' project.public_id milestone.public_id %}">Abbrechen</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

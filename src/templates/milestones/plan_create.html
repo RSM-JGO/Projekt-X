@@ -1,0 +1,24 @@
+{% extends "app_base.html" %}
+{% block title %}Planentwurf anlegen – {{ project.name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div class="page-head__text">
+    <p class="breadcrumb"><a href="{% url 'projects:list' %}">Projekte</a> / <a href="{% url 'projects:detail' project.public_id %}">{{ project.name }}</a> / <a href="{% url 'milestones:schedule' project.public_id %}">Termine & Zeitstrahl</a></p>
+    <h1>Neuen Planentwurf anlegen</h1>
+    <p class="page-head__meta">Der Entwurf übernimmt den genehmigten Plan. Erst mit der Genehmigung wird er zum genehmigten Plan.</p>
+  </div>
+</div>
+{% if acts_as_admin %}<p class="note note--admin">Du handelst als Administrator. Die Änderung wird protokolliert.</p>{% endif %}
+{% if draft %}<p class="note" role="note">Es gibt bereits den Entwurf <a href="{% url 'milestones:plan' project.public_id draft.number %}">Version {{ draft.number }}</a>.</p>{% endif %}
+<section class="card">
+  <form class="form" method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+    {% include "partials/field.html" with field=form.reason %}
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">Entwurf anlegen</button>
+      <a class="btn btn--ghost" href="{% url 'milestones:schedule' project.public_id %}">Abbrechen</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

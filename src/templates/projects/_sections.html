@@ -1,0 +1,13 @@
+<ul class="subnav__list">
+  {% for s in nav.sections %}
+  <li>
+    {% if s.url %}<a class="subnav__item{% if s.active %} is-active{% endif %}" href="{{ s.url }}"{% if s.active %} aria-current="page"{% endif %}>{% else %}<span class="subnav__item is-disabled" aria-disabled="true">{% endif %}
+      {% if s.marker %}{% include "partials/marker.html" with m=s.marker text=False %}{% else %}<span class="jstate"><span class="jstate__icon jstate__icon--blank" aria-hidden="true"></span></span>{% endif %}
+      <span class="subnav__label">{{ s.label }}
+        {% if s.marker or not s.url %}<span class="subnav__meta">{% if s.marker %}{{ s.marker.label }}{% endif %}{% if s.marker and not s.url %} · {% endif %}{% if not s.url %}folgt später{% endif %}</span>{% endif %}
+        {% if s.open_count %}<span class="subnav__ms">{{ nav.current.milestone.code }}: {{ s.open_count }} offen</span>{% endif %}
+      </span>
+    {% if s.url %}</a>{% else %}</span>{% endif %}
+  </li>
+  {% endfor %}
+</ul>

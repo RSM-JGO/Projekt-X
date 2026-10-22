@@ -1,6 +1,7 @@
 {% extends "app_base.html" %}
 {% block title %}{% if project %}Projekt bearbeiten{% else %}Projekt anlegen{% endif %}{% endblock %}
 {% block content %}
+{% if project_nav %}{% include "projects/_project_head.html" with nav=project_nav %}{% endif %}
 <div class="page-head">
   <div class="page-head__text">
     <p class="breadcrumb"><a href="{% url 'projects:list' %}">Projekte</a>{% if project %} / <a href="{% url 'projects:detail' project.public_id %}">{{ project.name }}</a>{% endif %}</p>
@@ -21,7 +22,11 @@
       {% include "partials/field.html" with field=form.start_date %}
       {% include "partials/field.html" with field=form.end_date %}
     </div>
-    <p class="card__hint">Der Projektzeitraum ist vorläufig ein einfaches Feld; Änderungen werden protokolliert.</p>
+    {% if period_locked %}
+    <p class="note" role="note">Der Projektzeitraum ist durch eine genehmigte Planversion festgelegt. Ändern über <a href="{% url 'milestones:schedule' project.public_id %}">Termine & Zeitstrahl</a> mit einem neuen Planentwurf.</p>
+    {% elif project %}
+    <p class="card__hint">Bis zur ersten Genehmigung eines Plans wird der Zeitraum auch in den Planentwurf übernommen. Änderungen werden protokolliert.</p>
+    {% endif %}
     <div class="form__actions">
       <button type="submit" class="btn btn--primary">{% if project %}Speichern{% else %}Projekt anlegen{% endif %}</button>
       <a class="btn btn--ghost" href="{% if project %}{% url 'projects:detail' project.public_id %}{% else %}{% url 'projects:list' %}{% endif %}">Abbrechen</a>

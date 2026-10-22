@@ -1,0 +1,5 @@
+<div class="app-nav__sub subnav" aria-label="Bereiche des Projekts">
+  <p class="subnav__project"><span class="subnav__project-name">{{ nav.project.name }}</span></p>
+  {% if nav.current %}<p class="subnav__context">Aktuell: <a href="{{ nav.current.url }}">{{ nav.current.milestone.label }}</a></p>{% endif %}
+  {% include "projects/_sections.html" with nav=nav %}
+</div>

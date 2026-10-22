@@ -1,0 +1,5 @@
+<div class="form__row form__check{% if field.errors %} has-error{% endif %}">
+  <label>{{ field }} <span>{{ field.label }}</span></label>
+  {% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}
+  {% if field.errors %}{{ field.errors }}{% endif %}
+</div>

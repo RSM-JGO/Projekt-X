@@ -36,9 +36,11 @@ Voraussetzungen: uv, Python 3.13 über uv, PostgreSQL 18 mit Rolle `projektx` un
 | Codeprüfung | `uv run ruff check` und `uv run ruff format --check` |
 | Fehlende Migrationen | `uv run python manage.py makemigrations --check --dry-run` |
 | Administrator anlegen (fragt E-Mail, Name, Passwort) | `uv run python manage.py create_admin` (optional `--mit-django-admin` für /admin) |
-| Beispieldaten laden: Konten, Projekte, Buckets, Aufgaben (nur mit `DJANGO_DEBUG=1`, Passwort aus `DEMO_PASSWORD`, mehrfach ausführbar) | `uv run python manage.py seed_demo` |
+| Beispieldaten laden: Konten, Projekte, Buckets, Aufgaben, Meilensteine, Freigaben, Planstände (nur mit `DJANGO_DEBUG=1`, Passwort aus `DEMO_PASSWORD`, mehrfach ausführbar) | `uv run python manage.py seed_demo` |
 
 Gesundheitsprüfung: http://127.0.0.1:8000/health/
+
+**Entwicklungsdatenbank zurücksetzen:** `uv run python manage.py flush` scheitert absichtlich, weil Änderungsprotokoll, Aufgabenverlauf, Freigaben, Terminverlauf und Planstände per Datenbank-Trigger nur anfügbar sind (auch TRUNCATE ist gesperrt). Stattdessen die Dev-Datenbank neu anlegen, als Superuser `postgres` in `psql`: `DROP DATABASE projektx_dev;` und `CREATE DATABASE projektx_dev OWNER projektx;`. Danach `uv run python manage.py migrate` und bei Bedarf `create_admin` bzw. `seed_demo`. Nur für `projektx_dev`, nie für produktive Daten.
 
 ## Externe Demo (Etappe 3, nur Beispieldaten)
 

@@ -36,7 +36,7 @@
     {% endif %}
     <div class="form__actions">
       <button type="submit" class="btn btn--primary">{% if task %}Speichern{% else %}Anlegen{% endif %}</button>
-      <a class="btn btn--ghost" href="{% if task %}{% url 'tasks:detail' task.public_id %}{% elif project %}{% url 'projects:detail' project.public_id %}{% else %}{% url 'tasks:workplace' %}{% endif %}">Abbrechen</a>
+      <a class="btn btn--ghost" href="{% if task %}{% url 'tasks:detail' task.public_id %}{% elif project %}{% url 'tasks:board' project.public_id %}{% else %}{% url 'tasks:workplace' %}{% endif %}">Abbrechen</a>
     </div>
   </form>
 </section>

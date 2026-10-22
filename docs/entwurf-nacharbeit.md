@@ -88,7 +88,7 @@ Die Begriffe „eine globale Rolle“ und „Projektrolle“ ersetzen sich durch
 
 | Baustein | Inhalt | Regel |
 | --- | --- | --- |
-| **Administrator-Kennzeichen** am Benutzer | Systemverwaltung: Benutzerkonten, Mitgliedschaften (protokolliert), Lesen aller Projekte nach E7 | Die einzige globale Rolle. Kein Freigaberecht und keine fremden persönlichen Aufgaben (E7, weiterhin Vorschlag). |
+| **Administrator-Kennzeichen** am Benutzer | Systemverwaltung: Benutzerkonten, Mitgliedschaften (protokolliert), Lesen aller Projekte nach E7 | Die einzige globale Rolle. *Überholt durch Entscheidung 004: Der Administrator darf alles, auch Freigaben und fremde persönliche Aufgaben.* |
 | **Befugnis „Projekte anlegen“** am Benutzer | Erlaubt das Anlegen neuer Projekte | Vergibt der Administrator. Die Befugnis gewährt **keinen** Zugriff auf bestehende Projekte. Wer anlegt, wird automatisch Projektleiter des neuen Projekts. |
 | **Befugnis „Projekte löschen“** am Benutzer | Logisches Löschen von Projekten mit Anzeige der betroffenen Inhalte (Produktgrundlage: „gesonderte Berechtigung“) | Vergibt der Administrator. Vorschlag: zunächst nur Administratoren. |
 | **Projektmitgliedschaft mit einer oder mehreren Projektrollen** (Projektleiter, Mitarbeiter, Management) | Was jemand in einem Projekt darf | Eine Person kann in verschiedenen Projekten verschiedene Rollen und in einem Projekt mehrere Rollen haben. Die Rechte ergeben sich als Vereinigung der Rollen. Eine aktive Mitgliedschaft hat mindestens eine aktive Rolle. Rollenzeiträume liegen innerhalb der Mitgliedschaft. Je Projekt gibt es mindestens einen aktiven Projektleiter mit aktivem Konto. Austritt, Rollenentzug und Kontodeaktivierung prüfen diese Regel. |
@@ -105,7 +105,7 @@ Die Zeile „Datei herunterladen: Management ja (P)“ entfällt. Gilt eine Pers
 
 **Zuweisung:** Aufgaben lassen sich nur Personen mit aktiver Rolle Projektleiter oder Mitarbeiter zuweisen. Eine reine Management-Rolle reicht nicht, damit über eine Zuweisung keine Schreibrechte entstehen.
 
-**Administrator in Projektinhalten:** Die alte Matrix gibt dem Administrator Schreibrechte, E7 nur Lese- und Mitgliedschaftsrechte. Das ist im ursprünglichen Entwurf widersprüchlich. Vorschlag: Der Administrator liest alles und verwaltet Mitgliedschaften. Korrekturen an Aufgaben sind nur als protokollierte Ausnahme erlaubt, Freigaben nie. Die Entscheidung fällt in V05; die Admin-Zeilen der alten Matrix gelten bis dahin als nicht festgelegt.
+**Administrator in Projektinhalten:** Die alte Matrix gibt dem Administrator Schreibrechte, E7 nur Lese- und Mitgliedschaftsrechte. Das ist im ursprünglichen Entwurf widersprüchlich. Vorschlag: Der Administrator liest alles und verwaltet Mitgliedschaften. Korrekturen an Aufgaben sind nur als protokollierte Ausnahme erlaubt, Freigaben nie. Die Entscheidung fällt in V05; die Admin-Zeilen der alten Matrix gelten bis dahin als nicht festgelegt. *Überholt durch Entscheidung 004 (Administrator darf alles, auch Freigaben).*
 
 Die vier Benutzerrollen der Produktgrundlage bleiben damit erhalten: Administrator global, die drei anderen projektbezogen. Die detaillierte Rechtematrix bleibt Aufgabe von V05.
 

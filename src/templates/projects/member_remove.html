@@ -3,7 +3,7 @@
 {% block content %}
 <div class="page-head">
   <div class="page-head__text">
-    <p class="breadcrumb"><a href="{% url 'projects:list' %}">Projekte</a> / <a href="{% url 'projects:detail' project.public_id %}">{{ project.name }}</a></p>
+    <p class="breadcrumb"><a href="{% url 'projects:list' %}">Projekte</a> / <a href="{% url 'projects:detail' project.public_id %}">{{ project.name }}</a> / <a href="{% url 'projects:team' project.public_id %}">Team</a></p>
     <h1>Mitglied entfernen</h1>
   </div>
 </div>
@@ -17,7 +17,7 @@
     <p><strong>{{ membership.user.display_name }}</strong> ({{ roles|join:", " }}) wird aus dem Projekt entfernt. Die bisherige Mitgliedschaft bleibt im Verlauf erhalten.</p>
     <div class="form__actions">
       <button type="submit" class="btn btn--danger">Entfernen</button>
-      <a class="btn btn--ghost" href="{% url 'projects:detail' project.public_id %}">Abbrechen</a>
+      <a class="btn btn--ghost" href="{% url 'projects:team' project.public_id %}">Abbrechen</a>
     </div>
   </form>
 </section>

@@ -77,3 +77,4 @@ In einem neuen Chat zuerst CLAUDE.md, README.md und diese Datei lesen, danach Ba
 - **F22** „Passwort anzeigen“ umgesetzt. **F23** Zoomen mobil unterbunden (Entscheidung 005; Hinweis zu WCAG und iOS dokumentiert).
 - **F19** Projekt-Journey und Menüstruktur: Skizze v1 bis v3 in `design/`; **v3 vom Benutzer angenommen**, Entscheidung 006. Fachliche Orientierung M0–M5 in `docs/fachliche-orientierung-projektablauf.md`.
 - **Nächster Schritt:** Umsetzungsplan `docs/plan-umsetzung-projektbereich.md`. Zuerst das Datenmodell-Konzept (Softwarearchitekt), dann Etappe 4a (Navigation, Meilensteine, Termine). Offene Fragen an den Benutzer stehen im Plan.
+- **Etappe 4a** (Projektnavigation, Meilensteine M0–M5, Lieferobjekte, Freigaben, historisierte Termine, Cockpit) umgesetzt, geprüft (872 Tests) und vom Benutzer am 22.10.2026 abgenommen. Nachweise in `docs/auftrag-etappe-4a.md`. Als Nächstes Etappe 4b Steckbrief & Auftrag.

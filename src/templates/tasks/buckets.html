@@ -50,7 +50,7 @@
     {% include "partials/field.html" with field=form.name %}
     <div class="form__actions">
       <button type="submit" class="btn btn--primary">Bucket anlegen</button>
-      <a class="btn btn--ghost" href="{% url 'projects:detail' project.public_id %}">Zurück zum Projekt</a>
+      <a class="btn btn--ghost" href="{% url 'tasks:board' project.public_id %}">Zurück zu den Aufgaben</a>
     </div>
   </form>
 </section>

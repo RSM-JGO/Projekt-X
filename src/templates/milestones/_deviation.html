@@ -1,0 +1,1 @@
+{% if d is None %}<span class="muted">–</span>{% elif d == 0 %}±0 Tage{% elif d > 0 %}+{{ d }} Tag{{ d|pluralize:"e" }}{% else %}{{ d }} Tag{{ d|pluralize:"e" }}{% endif %}

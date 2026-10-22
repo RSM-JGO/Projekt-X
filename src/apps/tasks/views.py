@@ -10,6 +10,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods, require_POST
 
+from apps.milestones import selectors as milestone_selectors
 from apps.projects import selectors as project_selectors
 from apps.projects.views import _add_service_errors
 
@@ -21,6 +22,13 @@ from .models import Bucket, TaskEventKind
 def _require(allowed):
     if not allowed:
         raise PermissionDenied
+
+
+def _nav(project):
+    """Projektmenü (Etappe 4a): Aufgaben sind der Bereich „Aufgaben“ des Projekts."""
+    if project is None:
+        return None
+    return milestone_selectors.navigation(project, "aufgaben")
 
 
 def _task_url(task):
@@ -59,6 +67,24 @@ def personal_task_create(request):
 
 
 @login_required
+@require_http_methods(["GET"])
+def project_board(request, public_id):
+    """Bereich „Aufgaben“: bisheriges Bucket-Board (bis zum neuen Board in Etappe 5)."""
+    project = project_selectors.get_accessible_project(request.user, public_id)
+    return render(
+        request,
+        "tasks/project_board.html",
+        {
+            "project": project,
+            "project_nav": _nav(project),
+            "board": selectors.project_board(project, request.GET.get("filter", "offen")),
+            "can_create_task": policies.can_create_project_task(request.user, project),
+            "can_manage_buckets": policies.can_manage_buckets(request.user, project),
+        },
+    )
+
+
+@login_required
 @require_http_methods(["GET", "POST"])
 def project_task_create(request, public_id):
     project = project_selectors.get_accessible_project(request.user, public_id)
@@ -67,7 +93,7 @@ def project_task_create(request, public_id):
         messages.error(request, "Bitte zuerst einen Bucket anlegen.")
         if policies.can_manage_buckets(request.user, project):
             return redirect("tasks:buckets", public_id=project.public_id)
-        return redirect("projects:detail", public_id=project.public_id)
+        return redirect("tasks:board", public_id=project.public_id)
     can_assign = policies.can_manage_assignees(request.user, project)
     initial = {}
     if policies.is_assignable(request.user, project):
@@ -90,6 +116,7 @@ def project_task_create(request, public_id):
         {
             "form": form,
             "project": project,
+            "project_nav": _nav(project),
             "task": None,
             "fixed_assignees": None if can_assign else [request.user],
             "acts_as_admin": policies.acts_as_admin(
@@ -109,6 +136,7 @@ def task_detail(request, public_id):
         "tasks/task_detail.html",
         {
             "task": task,
+            "project_nav": _nav(task.project),
             "assignees": [a.user for a in task.active_assignments],
             "events": selectors.events(task),
             "overdue": selectors.is_overdue(task),
@@ -164,6 +192,7 @@ def task_edit(request, public_id):
         {
             "form": form,
             "project": task.project,
+            "project_nav": _nav(task.project),
             "task": task,
             "fixed_assignees": None if can_assign else [a.user for a in task.active_assignments],
             "acts_as_admin": policies.acts_as_admin(policies.can_edit_task, request.user, task),
@@ -225,6 +254,7 @@ def buckets(request, public_id):
         "tasks/buckets.html",
         {
             "project": project,
+            "project_nav": _nav(project),
             "buckets": selectors.active_buckets(project),
             "form": form,
             "acts_as_admin": policies.acts_as_admin(

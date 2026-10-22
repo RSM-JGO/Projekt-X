@@ -1,0 +1,127 @@
+{% extends "app_base.html" %}
+{% block title %}{{ milestone.label }} – {{ project.name }}{% endblock %}
+{% block content %}
+{% include "projects/_project_head.html" with nav=project_nav %}
+<div class="page-head">
+  <div class="page-head__text">
+    <h1>{{ milestone.label }}</h1>
+    <p class="page-head__meta">
+      {% if state.number %}Abschnitt {{ state.number }} · {% endif %}{{ milestone.phase_name }}
+      {% if state.is_current %} · aktueller Meilenstein{% endif %}
+    </p>
+  </div>
+  {% if can_manage %}
+  <div class="page-head__actions">
+    <form method="post" action="{% url 'milestones:visibility' project.public_id milestone.public_id %}">
+      {% csrf_token %}
+      <input type="hidden" name="hidden" value="{% if milestone.is_hidden %}0{% else %}1{% endif %}">
+      <button type="submit" class="btn btn--small">{% if milestone.is_hidden %}Wieder einblenden{% else %}Ausblenden{% endif %}</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+
+{% if milestone.is_hidden %}<p class="note" role="note">Dieser Meilenstein ist ausgeblendet. Er erscheint nicht in Leiste und Menü; Freigaben und Planstände bleiben erhalten.</p>{% endif %}
+{% if acts_as_admin %}<p class="note note--admin">Du handelst als Administrator. Änderungen werden gekennzeichnet protokolliert.</p>{% endif %}
+
+{% if milestone.goal %}<p class="j-goal">{{ milestone.goal }}</p>{% endif %}
+
+<div class="j-grid j-grid--ms">
+  <section class="card" aria-labelledby="dl-title">
+    <div class="card__head">
+      <h2 id="dl-title">Lieferobjekte</h2>
+      {% include "partials/marker.html" with m=state.rating text=True %}
+    </div>
+    {% include "milestones/_progress.html" with s=state %}
+    {% if rows %}
+    <ul class="deliv-list">
+      {% for row in rows %}{% with d=row.deliverable %}
+      <li class="deliv">
+        {% include "partials/marker.html" with m=row.marker text=True %}
+        <span class="deliv__name">{{ d.title }}</span>
+        {% if d.required %}<span class="chip tone-brand">Pflicht</span>{% else %}<span class="chip chip--optional">optional</span>{% endif %}
+        <span class="deliv__meta">
+          Bereich: {% if row.area_url %}<a href="{{ row.area_url }}">{{ row.area_label }}</a>{% else %}{{ row.area_label }} <span class="muted">(folgt später)</span>{% endif %}
+          · Verantwortlich: {% if d.responsible %}{{ d.responsible.display_name }}{% else %}<span class="muted">niemand</span>{% endif %}
+          {% if d.note %}<span class="deliv__note">{{ d.note }}</span>{% endif %}
+        </span>
+        {% if row.can_set_status or can_manage %}
+        <span class="deliv__actions">
+          {% if row.can_set_status %}
+          <form class="inline-form" method="post" action="{% url 'milestones:deliverable_status' project.public_id d.public_id %}">
+            {% csrf_token %}
+            <label class="sr-only" for="st-{{ d.public_id }}">Status von {{ d.title }}</label>
+            <select id="st-{{ d.public_id }}" name="status">
+              {% for value, label in statuses %}<option value="{{ value }}"{% if value == d.status %} selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+            <button type="submit" class="btn btn--small">Status setzen</button>
+          </form>
+          {% endif %}
+          {% if can_manage %}<a class="btn btn--small" href="{% url 'milestones:deliverable_edit' project.public_id d.public_id %}">Bearbeiten<span class="sr-only">: {{ d.title }}</span></a>{% endif %}
+        </span>
+        {% endif %}
+      </li>
+      {% endwith %}{% endfor %}
+    </ul>
+    {% else %}
+      <p class="muted">Noch keine Lieferobjekte. Ohne Lieferobjekte gilt der Meilenstein als nicht bewertet.</p>
+    {% endif %}
+    <p class="card__hint j-hint">Orientierung, keine harte Vorgabe. „Pflicht“ kennzeichnet, was für die Freigabe benötigt wird. Der Status wird in dieser Etappe von Hand gepflegt.</p>
+    {% if can_manage %}<p><a class="btn btn--small" href="{% url 'milestones:deliverable_add' project.public_id milestone.public_id %}">Lieferobjekt ergänzen</a></p>{% endif %}
+  </section>
+
+  <section class="card" aria-labelledby="fg-title">
+    <div class="card__head">
+      <h2 id="fg-title">Freigabe</h2>
+      {% include "partials/marker.html" with m=state.approval_marker text=True %}
+    </div>
+    {% with a=state.approval %}
+    {% if a %}
+      {% include "milestones/_approval.html" with a=a %}
+    {% else %}
+      <p class="muted">Noch keine Freigabeentscheidung.</p>
+    {% endif %}
+    {% if can_manage %}
+      <p class="form__actions">
+        {% if not state.approval_valid %}<a class="btn btn--small btn--primary" href="{% url 'milestones:approve' project.public_id milestone.public_id %}">Freigabe erfassen</a>{% endif %}
+        {% if a %}<a class="btn btn--small" href="{% url 'milestones:approve' project.public_id milestone.public_id %}?korrektur=1">Aktuelle Freigabe korrigieren</a>{% endif %}
+      </p>
+      <p class="card__hint">Freigaben sind unveränderlich. Eine Korrektur ersetzt die aktuelle Freigabe; beide bleiben sichtbar. Solange eine Freigabe gültig ist, ist nur eine Korrektur möglich.</p>
+    {% endif %}
+    {% endwith %}
+  </section>
+</div>
+
+<section class="card j-block" aria-labelledby="ms-dates">
+  <div class="card__head"><h2 id="ms-dates">Termin</h2>{% if can_manage %}<a class="btn btn--small" href="{% url 'milestones:date_change' project.public_id milestone.public_id %}">Prognose oder Ist ändern</a>{% endif %}</div>
+  <dl class="facts">
+    <div><dt>Ursprünglicher Plan</dt><dd>{{ state.original_date|date:"d.m.Y"|default:"–" }}</dd></div>
+    <div><dt>Genehmigter Plan</dt><dd>{{ state.planned_date|date:"d.m.Y"|default:"–" }}</dd></div>
+    <div><dt>Prognose</dt><dd>{{ state.forecast_date|date:"d.m.Y"|default:"–" }}</dd></div>
+    <div><dt>Ist</dt><dd>{{ state.actual_date|date:"d.m.Y"|default:"–" }}</dd></div>
+  </dl>
+  {% if not state.has_date %}<p class="card__hint j-hint">Noch ohne Termin: Der Meilenstein gilt als nicht bewertet. Termine kommen über eine genehmigte Planversion oder eine Prognose.</p>{% endif %}
+</section>
+
+{% if state.approvals|length > 1 %}
+<section class="card j-block" aria-labelledby="fg-history">
+  <div class="card__head"><h2 id="fg-history">Frühere Freigabeentscheidungen</h2><span class="card__hint">unverändert erhalten</span></div>
+  <ul class="approval-history">
+    {% for item in state.approvals|slice:"1:" %}
+      <li>
+        <p>{% include "partials/marker.html" with m=item.marker text=True %} vom {{ item.approval.decided_on|date:"d.m.Y" }}
+          {% if item.replaced %}<span class="chip chip--optional">ersetzt durch Korrektur</span>{% endif %}</p>
+        {% include "milestones/_approval.html" with a=item.approval %}
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if not milestone.is_hidden %}
+<nav class="j-pager" aria-label="Meilensteine blättern">
+  {% if state.prev %}<a class="btn" href="{{ state.prev.url }}">‹ {{ state.prev.milestone.label }}</a>{% else %}<span></span>{% endif %}
+  {% if state.next %}<a class="btn" href="{{ state.next.url }}">{{ state.next.milestone.label }} ›</a>{% else %}<span></span>{% endif %}
+</nav>
+{% endif %}
+{% endblock %}

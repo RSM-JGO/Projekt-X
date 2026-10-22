@@ -115,3 +115,43 @@ def test_seed_demo_aufgaben_idempotent(settings, monkeypatch):
         persoenlich = Task.objects.filter(owner=owner)
         assert persoenlich.count() == 1
         assert "(Beispiel)" in persoenlich.get().title
+
+
+@pytest.mark.django_db
+def test_seed_demo_meilensteine_freigaben_und_plan(settings, monkeypatch):
+    """Etappe 4a: genehmigter Plan, Lieferobjekt-Status, M0 grün, M1 orange mit Auflagen (A)."""
+    from apps.milestones import selectors, services
+    from apps.milestones.models import Approval, DateChange, Deliverable, PlanVersion
+
+    settings.DEBUG = True
+    monkeypatch.setenv("DEMO_PASSWORD", "Demo-Passwort-fuer-Tests-1")
+    call_command("seed_demo")
+
+    def zaehlung():
+        return (
+            Approval.objects.count(),
+            DateChange.objects.count(),
+            PlanVersion.objects.count(),
+            list(Deliverable.objects.order_by("id").values_list("status", "responsible_id")),
+        )
+
+    vorher = zaehlung()
+    call_command("seed_demo")
+    assert zaehlung() == vorher
+
+    a = Project.objects.get(name__startswith="Beispielprojekt A")
+    b = Project.objects.get(name__startswith="Beispielprojekt B")
+    for project in (a, b):
+        approved = services.approved_version(project)
+        assert approved is not None and approved.entries.filter(kind="MEILENSTEIN").count() == 6
+        period = approved.entries.get(kind="ZEITRAUM")
+        assert (project.start_date, project.end_date) == (period.start_date, period.end_date)
+        assert Deliverable.objects.filter(project=project).exclude(status="FEHLT").exists()
+
+    m0, m1 = (Approval.objects.get(milestone__project=a, milestone__code=c) for c in ("M0", "M1"))
+    assert m0.light == "GRUEN" and m0.missing_required == []
+    assert m1.light == "ORANGE" and m1.conditions and m1.warning_confirmed
+    assert [m["title"] for m in m1.missing_required] == ["RACI-Matrix"]
+    assert not Approval.objects.filter(project=b).exists()
+    assert selectors.journey(a)["current"]["milestone"].code == "M2"
+    assert DateChange.objects.filter(project=a, kind="PROGNOSE").exists()

@@ -9,6 +9,16 @@ from apps.projects.models import ProjectRole
 
 PASSWORT = "Test-Passwort-fuer-Tests-123"
 
+# Etappe 4a: nur anfügbare bzw. nach Genehmigung unveränderliche Tabellen
+# (Trigger in milestones 0002)
+MILESTONE_APPEND_ONLY_TABLES = (
+    "milestones_approval",
+    "milestones_approvalparticipant",
+    "milestones_datechange",
+    "milestones_planversion",
+    "milestones_planentry",
+)
+
 
 @pytest.fixture(scope="session")
 def django_db_setup(django_db_setup, django_db_blocker):
@@ -21,10 +31,20 @@ def django_db_setup(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock(), connection.cursor() as cursor:
         cursor.execute("ALTER TABLE audit_auditlog DISABLE TRIGGER audit_auditlog_no_truncate")
         cursor.execute("ALTER TABLE tasks_taskevent DISABLE TRIGGER tasks_taskevent_no_truncate")
+        for table in MILESTONE_APPEND_ONLY_TABLES:
+            cursor.execute(f"ALTER TABLE {table} DISABLE TRIGGER {table}_no_truncate")
 
 
 @pytest.fixture
-def make_user(db):
+def standardkatalog(db):
+    """Standardkatalog sicherstellen: flush (transaction=True) leert auch Migrationsdaten."""
+    from apps.milestones.catalog import ensure_standard_catalog
+
+    ensure_standard_catalog()
+
+
+@pytest.fixture
+def make_user(standardkatalog):
     counter = {"n": 0}
 
     def _make(email=None, password=None, **extra):

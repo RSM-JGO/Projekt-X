@@ -10,6 +10,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from apps.audit.services import record
+from apps.milestones import services as milestone_services
 from apps.tasks import services as task_services
 
 from . import policies
@@ -106,6 +107,8 @@ def create_project(*, actor, name, description="", start_date, end_date):
         project=project,
         new={"user": actor.email, "roles": [ProjectRole.PROJEKTLEITER.value]},
     )
+    # Etappe 4a: M0–M5 mit Standard-Lieferobjekten und Planversion 1 als Entwurf
+    milestone_services.initialize_project(project=project, actor=actor)
     return project
 
 
@@ -125,7 +128,15 @@ def update_project(*, actor, project, **changes):
     changed = [f for f in PROJECT_FIELDS if old[f] != new[f]]
     if not changed:
         return project
+    period_changed = "start_date" in changed or "end_date" in changed
+    if period_changed and milestone_services.period_locked(project):
+        # Nach der ersten Genehmigung nur noch über Planversionen (Abnahmekriterium 11)
+        raise ValidationError({"start_date": milestone_services.ZEITRAUM_GESPERRT})
     project.save()
+    if period_changed:
+        synced = milestone_services.sync_draft_period(project, old["start_date"], old["end_date"])
+        # Hinweis für die Oberfläche: bearbeiteter Planentwurf wurde nicht überschrieben
+        project.draft_period_kept = not synced
     record(
         actor=actor,
         action="project.updated",

@@ -7,6 +7,7 @@ app_name = "tasks"
 urlpatterns = [
     path("arbeitsplatz/", views.workplace, name="workplace"),
     path("arbeitsplatz/aufgabe-neu/", views.personal_task_create, name="personal_create"),
+    path("projekte/<uuid:public_id>/aufgaben/", views.project_board, name="board"),
     path("projekte/<uuid:public_id>/aufgaben/neu/", views.project_task_create, name="create"),
     path("projekte/<uuid:public_id>/buckets/", views.buckets, name="buckets"),
     path(

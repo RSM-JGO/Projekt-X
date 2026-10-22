@@ -1,6 +1,6 @@
 # Plan: Umsetzung des Projektbereichs in der echten Anwendung
 
-Status: **Vorschlag des Projektleiters**, Stand 22.10.2026. Grundlage: Entscheidung 006 und die Skizze F19 v3. Die Reihenfolge entscheidet der Benutzer. Jede Etappe folgt dem bewährten Ablauf: Abnahmekriterien → Umsetzung (Entwickler) → Tests, Browserprüfung und Review → Benutzerabnahme → Commit.
+Status: Vom Benutzer am 22.10.2026 bestätigt (Freigabe mit Warnung, Meilensteine je Projekt anpassbar, zuerst Datenmodell und 4a); siehe Entscheidung 006. Grundlage: Entscheidung 006 und die Skizze F19 v3. Die Reihenfolge entscheidet der Benutzer. Jede Etappe folgt dem bewährten Ablauf: Abnahmekriterien → Umsetzung (Entwickler) → Tests, Browserprüfung und Review → Benutzerabnahme → Commit.
 
 ## Vorab: Datenmodell klären (Softwarearchitekt, nur Konzept)
 

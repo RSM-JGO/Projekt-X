@@ -3,7 +3,7 @@
 {% block content %}
 <div class="page-head">
   <div class="page-head__text">
-    <p class="breadcrumb"><a href="{% url 'projects:list' %}">Projekte</a> / <a href="{% url 'projects:detail' project.public_id %}">{{ project.name }}</a></p>
+    <p class="breadcrumb"><a href="{% url 'projects:list' %}">Projekte</a> / <a href="{% url 'projects:detail' project.public_id %}">{{ project.name }}</a> / <a href="{% url 'projects:team' project.public_id %}">Team</a></p>
     <h1>Rollen ändern: {{ membership.user.display_name }}</h1>
   </div>
 </div>
@@ -18,7 +18,7 @@
     <p class="card__hint">Jedes Projekt braucht mindestens einen aktiven Projektleiter.</p>
     <div class="form__actions">
       <button type="submit" class="btn btn--primary">Speichern</button>
-      <a class="btn btn--ghost" href="{% url 'projects:detail' project.public_id %}">Abbrechen</a>
+      <a class="btn btn--ghost" href="{% url 'projects:team' project.public_id %}">Abbrechen</a>
     </div>
   </form>
 </section>

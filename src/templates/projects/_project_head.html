@@ -1,0 +1,33 @@
+<p class="breadcrumb project-crumb"><a href="{% url 'projects:list' %}">Projekte</a> / <a href="{% url 'projects:detail' nav.project.public_id %}">{{ nav.project.name }}</a></p>
+{% with j=nav.journey sel=nav.selected %}
+{% if j.visible %}
+<nav class="j-orient" aria-label="Abschnitte und Meilensteine">
+  <ol class="j-orient__list">
+    {% for s in j.visible %}
+    <li><a class="j-orient__step{% if s.is_past %} is-past{% endif %}{% if s.is_current %} is-current{% endif %}{% if nav.on_milestone and sel and s.milestone.pk == sel.milestone.pk %} is-selected{% endif %}" href="{{ s.url }}"{% if nav.on_milestone and sel and s.milestone.pk == sel.milestone.pk %} aria-current="page"{% endif %} title="{{ s.milestone.label }}: {{ s.approval_marker.label }}, {% if s.rating.label == 'nicht bewertet' %}nicht bewertet{% else %}{{ s.present }} von {{ s.total }} Lieferobjekten vorhanden{% endif %}">
+      <span class="j-orient__name">{{ s.milestone.phase_name }}{% if s.is_current %}<span class="sr-only"> (aktueller Abschnitt)</span>{% endif %}</span>
+      <span class="j-orient__ms">{% include "partials/marker.html" with m=s.approval_marker text=False %} {{ s.milestone.code }}<span class="j-orient__count">{% if s.rating.label == "nicht bewertet" %}nicht bewertet{% else %}{{ s.present }}/{{ s.total }}{% endif %}</span></span>
+    </a></li>
+    {% endfor %}
+  </ol>
+  {% if sel %}
+  <p class="j-orient__compact">
+    {% if sel.prev %}<a class="j-orient__nav" href="{{ sel.prev.url }}" aria-label="Voriger Meilenstein: {{ sel.prev.milestone.label }}">‹</a>{% endif %}
+    <a href="{{ sel.url }}">Abschnitt {{ sel.number }} von {{ j.count }}: <strong>{{ sel.milestone.phase_name }}</strong> · {{ sel.milestone.label }}</a>
+    {% include "partials/marker.html" with m=sel.approval_marker text=True %}
+    {% if sel.next %}<a class="j-orient__nav" href="{{ sel.next.url }}" aria-label="Nächster Meilenstein: {{ sel.next.milestone.label }}">›</a>{% endif %}
+  </p>
+  {% endif %}
+  <p class="j-orient__hint">Orientierung – kein festes Phasenmodell. Freigabe:
+    <span class="jstate"><span class="jstate__icon tone-mint" aria-hidden="true">✓</span><span class="jstate__text">erteilt</span></span>
+    <span class="jstate"><span class="jstate__icon tone-peach" aria-hidden="true">!</span><span class="jstate__text">unter Auflagen</span></span>
+    <span class="jstate"><span class="jstate__icon tone-rose" aria-hidden="true">✕</span><span class="jstate__text">keine Freigabe</span></span>
+    <span class="jstate"><span class="jstate__icon tone-neutral" aria-hidden="true">○</span><span class="jstate__text">offen oder abgelaufen</span></span>
+  </p>
+</nav>
+{% endif %}
+{% endwith %}
+<details class="j-mobilemenu">
+  <summary class="btn j-mobilemenu__toggle">Projektmenü: {{ nav.active_label }}</summary>
+  <div class="j-mobilemenu__list">{% include "projects/_sections.html" with nav=nav %}</div>
+</details>

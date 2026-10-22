@@ -1,0 +1,51 @@
+{% extends "app_base.html" %}
+{% load px %}
+{% block title %}Team – {{ project.name }}{% endblock %}
+{% block content %}
+{% include "projects/_project_head.html" with nav=project_nav %}
+<div class="page-head">
+  <div class="page-head__text">
+    <h1>Team & Mitglieder</h1>
+    <p class="page-head__meta">
+      {% if my_roles %}Deine Rollen:
+        {% for role in my_roles %}<span class="chip {{ role|role_tone }}">{{ role.label }}</span> {% endfor %}
+      {% elif acts_as_admin %}Du siehst dieses Projekt als Administrator.{% endif %}
+    </p>
+  </div>
+  {% if can_manage_members %}
+    <div class="page-head__actions"><a class="btn btn--primary" href="{% url 'projects:member_add' project.public_id %}">Mitglied hinzufügen</a></div>
+  {% endif %}
+</div>
+
+<section class="card" aria-labelledby="mitglieder-title">
+  <div class="card__head">
+    <h2 id="mitglieder-title">Mitglieder</h2>
+    {% if not can_manage_members %}<span class="card__hint">nur lesen</span>{% endif %}
+  </div>
+  <div class="table-wrap table-wrap--cards">
+    <table class="table table--cards">
+      <caption class="sr-only">Mitglieder mit Projektrollen</caption>
+      <thead><tr><th scope="col">Person</th><th scope="col">Rollen</th>{% if can_manage_members %}<th scope="col"><span class="sr-only">Aktionen</span></th>{% endif %}</tr></thead>
+      <tbody>
+        {% for m in members %}
+        <tr>
+          <td data-label="Person">
+            <span class="person-inline"><span class="avatar{% if m.user.pk == user.pk %} is-me{% endif %}" aria-hidden="true">{{ m.user|initials }}</span>
+            <span>{{ m.user.display_name }}<span class="table__sub">{{ m.user.email }}</span></span></span>
+          </td>
+          <td data-label="Rollen"><span class="chips">{% for role in m.roles %}<span class="chip {{ role|role_tone }}">{{ role.label }}</span>{% endfor %}</span></td>
+          {% if can_manage_members %}
+          <td>
+            <span class="table__actions">
+              <a class="btn btn--small" href="{% url 'projects:member_roles' project.public_id m.membership.pk %}">Rollen ändern</a>
+              <a class="btn btn--small btn--danger" href="{% url 'projects:member_remove' project.public_id m.membership.pk %}">Entfernen</a>
+            </span>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

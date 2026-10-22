@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     "apps.audit",
     "apps.projects",
     "apps.tasks",
+    "apps.milestones",
 ]
 
 MIDDLEWARE = [

@@ -23,7 +23,7 @@ Status: Offen, In Arbeit, Zur Prüfung, Erledigt. Ein technischer Nachweis und e
 1. V07b gemeinsame Aufgaben abschließen und abnehmen.
 2. Arbeitsplatz-Aufbau anhand der echten Version überarbeiten.
 3. Erledigt: Externe Demo-Ansicht inkl. F16 Versionsanzeige, vom Benutzer am 21.10.2026 abgenommen (docs/auftrag-demo-ansicht.md).
-4. **Neu geplant nach Entscheidung 006 (22.10.2026), Details in docs/plan-umsetzung-projektbereich.md:** zuerst Datenmodell-Konzept, dann 4a Projektnavigation, Meilensteine und Termine; 4b Steckbrief & Auftrag.
+4. **Neu geplant nach Entscheidung 006 (22.10.2026), Details in docs/plan-umsetzung-projektbereich.md:** Datenmodell-Konzept erledigt; **4a Projektnavigation, Meilensteine und Termine erledigt und vom Benutzer am 22.10.2026 abgenommen**; als Nächstes 4b Steckbrief & Auftrag.
 5. Aufgabenboard neu: Status-Kanban, Ziehen, Priorität, Kommentare, Filter; Anhänge und Kalender später.
 6. Kommunikation: Stakeholder, Kommunikationsmatrix, RACI (F20, F21).
 7. Risiken & Chancen (F11).

@@ -1,0 +1,12 @@
+{% extends "app_base.html" %}
+{% block title %}Aufgaben – {{ project.name }}{% endblock %}
+{% block content %}
+{% include "projects/_project_head.html" with nav=project_nav %}
+<div class="page-head">
+  <div class="page-head__text">
+    <h1>Aufgaben</h1>
+    <p class="page-head__meta">Bisheriges Board nach Buckets. Das neue Board folgt in Etappe 5.</p>
+  </div>
+</div>
+{% include "tasks/_board.html" %}
+{% endblock %}

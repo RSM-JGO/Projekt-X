@@ -21,6 +21,14 @@ class ProjectForm(forms.Form):
     start_date = forms.DateField(label="Beginn", widget=DateInput())
     end_date = forms.DateField(label="Ende", widget=DateInput())
 
+    def __init__(self, *args, period_locked=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        if period_locked:
+            # Gesperrte Felder: Django verwendet den Ausgangswert, eingesandte Werte zählen nicht
+            for name in ("start_date", "end_date"):
+                self.fields[name].disabled = True
+                self.fields[name].help_text = "Änderbar über eine neue Planversion."
+
     def clean(self):
         cleaned = super().clean()
         start, end = cleaned.get("start_date"), cleaned.get("end_date")

@@ -204,7 +204,8 @@ def test_erledigte_aufgaben_ueber_filter_sichtbar(client, aufgaben):
     assert ids("alle")[0] == {t["t_ma"].pk, t["t_pl"].pk}
 
     client.force_login(u["mgmt"])
-    url = reverse("projects:detail", args=[a.public_id])
+    # Etappe 4a: Das Board steht im Projektbereich „Aufgaben“ statt auf der Übersicht
+    url = reverse("tasks:board", args=[a.public_id])
     assert "Aufgabe MA" not in client.get(url).content.decode()
     assert "Aufgabe MA" in client.get(url + "?filter=erledigt").content.decode()
     assert "Aufgabe MA" in client.get(url + "?filter=alle").content.decode()

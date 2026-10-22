@@ -1,0 +1,29 @@
+{% extends "app_base.html" %}
+{% block title %}Meilenstein ergänzen – {{ project.name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div class="page-head__text">
+    <p class="breadcrumb"><a href="{% url 'projects:list' %}">Projekte</a> / <a href="{% url 'projects:detail' project.public_id %}">{{ project.name }}</a> / <a href="{% url 'milestones:schedule' project.public_id %}">Termine & Zeitstrahl</a></p>
+    <h1>Meilenstein ergänzen</h1>
+    <p class="page-head__meta">Eigene Meilensteine ergänzen den Standard M0–M5. Meilensteine werden nie gelöscht, nur ausgeblendet.</p>
+  </div>
+</div>
+{% if acts_as_admin %}<p class="note note--admin">Du handelst als Administrator. Die Änderung wird protokolliert.</p>{% endif %}
+<section class="card">
+  <form class="form" method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+    <div class="form__row--split">
+      {% include "partials/field.html" with field=form.code %}
+      {% include "partials/field.html" with field=form.after %}
+    </div>
+    {% include "partials/field.html" with field=form.phase_name %}
+    {% include "partials/field.html" with field=form.title %}
+    {% include "partials/field.html" with field=form.goal %}
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">Meilenstein ergänzen</button>
+      <a class="btn btn--ghost" href="{% url 'milestones:schedule' project.public_id %}">Abbrechen</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

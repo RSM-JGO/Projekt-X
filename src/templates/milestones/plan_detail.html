@@ -1,0 +1,75 @@
+{% extends "app_base.html" %}
+{% block title %}Planversion {{ version.number }} – {{ project.name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div class="page-head__text">
+    <p class="breadcrumb"><a href="{% url 'projects:list' %}">Projekte</a> / <a href="{% url 'projects:detail' project.public_id %}">{{ project.name }}</a> / <a href="{% url 'milestones:schedule' project.public_id %}">Termine & Zeitstrahl</a></p>
+    <h1>Planversion {{ version.number }} <span class="chip {% if version.is_draft %}chip--optional{% else %}tone-sky{% endif %}">{{ version.get_status_display }}</span></h1>
+    <p class="page-head__meta">
+      Angelegt von {{ version.created_by.display_name }} am {{ version.created_at|date:"d.m.Y" }}
+      {% if version.approved_by %} · genehmigt von {{ version.approved_by.display_name }}{% if version.approved_as_admin %} (als Administrator){% endif %} am {{ version.approved_at|date:"d.m.Y" }}{% endif %}
+    </p>
+  </div>
+  {% if version.is_draft and can_manage %}
+  <div class="page-head__actions">
+    <form method="post" action="{% url 'milestones:plan_approve' project.public_id version.number %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn--primary">Entwurf genehmigen</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+
+{% if acts_as_admin and version.is_draft %}<p class="note note--admin">Du handelst als Administrator. Änderungen und Genehmigung werden gekennzeichnet protokolliert.</p>{% endif %}
+{% if not version.is_draft %}<p class="note" role="note">Genehmigte Planversionen sind unveränderlich. Änderungen erfolgen über einen neuen Entwurf.</p>{% endif %}
+
+{% if form %}
+<section class="card">
+  <div class="card__head"><h2>Entwurf bearbeiten</h2><span class="card__hint">Mit der Genehmigung wird der Projektzeitraum übernommen.</span></div>
+  <form class="form" method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+    {% include "partials/field.html" with field=form.reason %}
+    <div class="form__row--split">
+      {% include "partials/field.html" with field=form.start_date %}
+      {% include "partials/field.html" with field=form.end_date %}
+    </div>
+    <fieldset class="form__group">
+      <legend>Meilensteintermine <span class="muted">(leer = ohne Termin, gilt dann als nicht bewertet)</span></legend>
+      <div class="form__grid">
+        {% for field in form.milestone_fields %}{% include "partials/field.html" with field=field %}{% endfor %}
+      </div>
+      {% if form.hidden_fields_list %}
+      <details class="hidden-entries"{% if form.errors %} open{% endif %}>
+        <summary>Ausgeblendete Meilensteine mit Planeintrag ({{ form.hidden_fields_list|length }})</summary>
+        <p class="small muted">Nicht in Leiste und Menü, aber Teil des Plans. Leer lassen entfernt den Termin.</p>
+        <div class="form__grid">
+          {% for field in form.hidden_fields_list %}{% include "partials/field.html" with field=field %}{% endfor %}
+        </div>
+      </details>
+      {% endif %}
+    </fieldset>
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">Entwurf speichern</button>
+      <a class="btn btn--ghost" href="{% url 'milestones:schedule' project.public_id %}">Zurück</a>
+    </div>
+  </form>
+</section>
+{% else %}
+<section class="card">
+  <div class="card__head"><h2>Inhalt</h2>{% if version.reason %}<span class="card__hint">Anlass: {{ version.reason }}</span>{% endif %}</div>
+  <div class="table-wrap table-wrap--cards">
+    <table class="table table--cards">
+      <caption class="sr-only">Einträge der Planversion {{ version.number }}</caption>
+      <thead><tr><th scope="col">Objekt</th><th scope="col">Termin</th></tr></thead>
+      <tbody>
+        <tr><td data-label="Objekt" class="table__title">Projektzeitraum</td><td data-label="Termin">{% if detail.period %}{{ detail.period.start_date|date:"d.m.Y" }} – {{ detail.period.end_date|date:"d.m.Y" }}{% else %}–{% endif %}</td></tr>
+        {% for row in rows %}
+        <tr><td data-label="Objekt" class="table__title">{{ row.state.milestone.label }}{% if row.state.milestone.is_hidden %} <span class="muted">(ausgeblendet)</span>{% endif %}</td><td data-label="Termin">{{ row.date|date:"d.m.Y"|default:"ohne Termin" }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

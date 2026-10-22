@@ -9,6 +9,7 @@ urlpatterns = [
     path("neu/", views.project_create, name="create"),
     path("<uuid:public_id>/", views.project_detail, name="detail"),
     path("<uuid:public_id>/bearbeiten/", views.project_edit, name="edit"),
+    path("<uuid:public_id>/team/", views.team, name="team"),
     path("<uuid:public_id>/mitglieder/neu/", views.member_add, name="member_add"),
     path(
         "<uuid:public_id>/mitglieder/<int:membership_id>/rollen/",

@@ -15,9 +15,11 @@ class ProjectRole(models.TextChoices):
 class Project(models.Model):
     """Projekt. URLs verwenden ausschließlich public_id, nie den internen Schlüssel.
 
-    Der Projektzeitraum ist vorläufig ein einfaches Feldpaar. Änderungen werden im
-    Änderungsprotokoll festgehalten; die spätere Historisierung (ursprünglicher Plan,
-    genehmigter Plan, Prognose, Ist) erfolgt über Planversionen und ersetzt diese Felder.
+    Projektzeitraum (Etappe 4a): start_date/end_date bleiben die Anzeige. Bis zur ersten
+    genehmigten Planversion sind sie direkt änderbar; danach ändern sie sich nur noch über die
+    Genehmigung einer Planversion und werden dabei mitgeführt (apps.milestones.services).
+    Prognose und Ist des Zeitraums sind aktuelle Werte; ihr Verlauf steht in den
+    Terminänderungen (apps.milestones.models.DateChange).
     """
 
     public_id = models.UUIDField("öffentliche ID", default=uuid.uuid4, unique=True, editable=False)
@@ -25,6 +27,10 @@ class Project(models.Model):
     description = models.TextField("Beschreibung", blank=True)
     start_date = models.DateField("Beginn")
     end_date = models.DateField("Ende")
+    forecast_start_date = models.DateField("Prognose Beginn", null=True, blank=True)
+    forecast_end_date = models.DateField("Prognose Ende", null=True, blank=True)
+    actual_start_date = models.DateField("Ist Beginn", null=True, blank=True)
+    actual_end_date = models.DateField("Ist Ende", null=True, blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,

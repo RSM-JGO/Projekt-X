@@ -37,10 +37,11 @@
           </a>
         </li>
         <li>
-          <a class="app-nav__item" href="{% url 'projects:list' %}"{% if request.resolver_match.namespace == "projects" %} aria-current="page"{% endif %}>
+          <a class="app-nav__item" href="{% url 'projects:list' %}"{% if project_nav %} aria-current="true"{% elif request.resolver_match.namespace == "projects" %} aria-current="page"{% endif %}>
             <svg class="app-nav__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="4" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="4" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="4" y="13" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="13" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
             <span class="app-nav__label">Projekte</span>
           </a>
+          {% if project_nav %}{% include "projects/_subnav.html" with nav=project_nav %}{% endif %}
         </li>
         <li>
           <span class="app-nav__item is-disabled" aria-disabled="true" title="Management folgt später">

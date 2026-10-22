@@ -1,0 +1,17 @@
+<dl class="facts j-facts j-facts--wide">
+  <div><dt>Entscheidung</dt><dd>{{ a.get_light_display }} – {{ a.decision }}</dd></div>
+  <div><dt>Datum</dt><dd>{{ a.decided_on|date:"d.m.Y" }}</dd></div>
+  <div><dt>Beteiligte</dt><dd>{% for p in a.participant_links.all %}{{ p.display_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if a.external_participants %}{% if a.participant_links.all %}; {% endif %}{{ a.external_participants }}{% endif %}{% if not a.participant_links.all and not a.external_participants %}<span class="muted">keine angegeben</span>{% endif %}</dd></div>
+  <div><dt>Grundlage</dt><dd>{{ a.basis|default:"–" }}</dd></div>
+  <div><dt>Auflagen</dt><dd>{{ a.conditions|default:"keine" }}</dd></div>
+  <div><dt>Gültig bis</dt><dd>{% if a.valid_until %}{{ a.valid_until|date:"d.m.Y" }}{% else %}ohne Ablauf{% endif %}</dd></div>
+  {% if a.plan_version %}<div><dt>Planversion</dt><dd>Version {{ a.plan_version.number }}</dd></div>{% endif %}
+  <div><dt>Erfasst von</dt><dd>{{ a.granted_by.display_name }}{% if a.as_admin %} <span class="chip tone-sky">als Administrator</span>{% endif %} am {{ a.created_at|date:"d.m.Y H:i" }}</dd></div>
+  {% if a.replaces_id %}<div><dt>Korrektur</dt><dd>ersetzt die Freigabe vom {{ a.replaces.decided_on|date:"d.m.Y" }}</dd></div>{% endif %}
+  <div><dt>Fehlende Pflichtdokumente zum Zeitpunkt</dt><dd>
+    {% if a.missing_required %}
+      <ul class="j-lines">{% for m in a.missing_required %}<li>{{ m.title }}</li>{% endfor %}</ul>
+      {% if a.warning_confirmed %}<span class="small muted">Warnung wurde bestätigt.</span>{% endif %}
+    {% else %}keine{% endif %}
+  </dd></div>
+</dl>

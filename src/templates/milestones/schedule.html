@@ -1,0 +1,120 @@
+{% extends "app_base.html" %}
+{% block title %}Termine & Zeitstrahl – {{ project.name }}{% endblock %}
+{% block content %}
+{% include "projects/_project_head.html" with nav=project_nav %}
+<div class="page-head">
+  <div class="page-head__text">
+    <h1>Termine & Zeitstrahl</h1>
+    <p class="page-head__meta">
+      {% if plans.approved_version %}Genehmigter Plan: Version {{ plans.approved_version.number }}{% else %}Noch kein genehmigter Plan{% endif %}
+      {% if plans.draft %} · Entwurf: <a href="{% url 'milestones:plan' project.public_id plans.draft.number %}">Version {{ plans.draft.number }}</a>{% endif %}
+    </p>
+  </div>
+  {% if can_manage %}
+  <div class="page-head__actions">
+    {% if plans.draft %}<a class="btn btn--primary" href="{% url 'milestones:plan' project.public_id plans.draft.number %}">Planentwurf bearbeiten</a>{% else %}<a class="btn btn--primary" href="{% url 'milestones:plan_create' project.public_id %}">Neuen Planentwurf anlegen</a>{% endif %}
+    <a class="btn" href="{% url 'milestones:period_change' project.public_id %}">Prognose/Ist Projektzeitraum</a>
+    <a class="btn" href="{% url 'milestones:add' project.public_id %}">Meilenstein ergänzen</a>
+  </div>
+  {% endif %}
+</div>
+
+{% if acts_as_admin %}<p class="note note--admin">Du handelst als Administrator. Änderungen werden gekennzeichnet protokolliert.</p>{% endif %}
+
+<section class="card" aria-labelledby="tl-title">
+  <div class="card__head"><h2 id="tl-title">Zeitstrahl</h2><span class="card__hint">Punkte zeigen Ist, sonst Prognose, sonst genehmigten Plan</span></div>
+  {% with tl=schedule.timeline %}
+  <div class="tl" role="img" aria-label="Zeitstrahl der Meilensteine von {{ tl.first|date:'d.m.Y' }} bis {{ tl.last|date:'d.m.Y' }}{% if tl.today_left is not None %} mit Markierung für heute{% endif %}">
+    <div class="tl__bar"></div>
+    <ol class="tl__points">
+      {% for p in tl.points %}
+      <li class="tl__point tone-{{ p.state.approval_marker.tone }}" style="left:{{ p.left|stringformat:'s' }}%" title="{{ p.state.milestone.label }}: {{ p.state.date|date:'d.m.Y' }} ({{ p.kind }}), {{ p.state.approval_marker.label }}"><span class="tl__label">{{ p.state.milestone.code }}</span></li>
+      {% endfor %}
+    </ol>
+    {% if tl.today_left is not None %}<span class="tl__today" style="left:{{ tl.today_left|stringformat:'s' }}%"><span>heute</span></span>{% endif %}
+  </div>
+  <p class="tl__range muted"><span>{{ tl.first|date:"d.m.Y" }}</span><span>{{ tl.last|date:"d.m.Y" }}</span></p>
+  {% endwith %}
+  {% if schedule.undated %}<p class="card__hint j-hint">Ohne Termin und daher nicht bewertet: {% for s in schedule.undated %}{{ s.milestone.code }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+</section>
+
+<section class="card j-block" aria-labelledby="dates-title">
+  <div class="card__head"><h2 id="dates-title">Projektzeitraum und Meilensteine</h2><span class="card__hint">Abweichung = Ist bzw. Prognose gegenüber genehmigtem Plan</span></div>
+  <div class="table-wrap table-wrap--cards">
+    <table class="table table--cards">
+      <caption class="sr-only">Termine mit ursprünglichem Plan, genehmigtem Plan, Prognose und Ist</caption>
+      <thead><tr><th scope="col">Objekt</th><th scope="col">Ursprünglicher Plan</th><th scope="col">Genehmigter Plan</th><th scope="col">Prognose</th><th scope="col">Ist</th><th scope="col">Abweichung</th><th scope="col">Freigabe</th>{% if can_manage %}<th scope="col"><span class="sr-only">Aktionen</span></th>{% endif %}</tr></thead>
+      <tbody>
+        {% for r in schedule.period_rows %}
+        <tr>
+          <td data-label="Objekt" class="table__title">{{ r.label }}</td>
+          <td data-label="Ursprünglicher Plan">{{ r.original|date:"d.m.Y"|default:"–" }}</td>
+          <td data-label="Genehmigter Plan">{{ r.planned|date:"d.m.Y"|default:"–" }}</td>
+          <td data-label="Prognose">{{ r.forecast|date:"d.m.Y"|default:"–" }}</td>
+          <td data-label="Ist">{{ r.actual|date:"d.m.Y"|default:"–" }}</td>
+          <td data-label="Abweichung">{% include "milestones/_deviation.html" with d=r.deviation %}</td>
+          <td data-label="Freigabe"><span class="muted">–</span></td>
+          {% if can_manage %}<td>{% if forloop.first %}<span class="table__actions"><a class="btn btn--small" href="{% url 'milestones:period_change' project.public_id %}">Prognose/Ist</a></span>{% endif %}</td>{% endif %}
+        </tr>
+        {% endfor %}
+        {% for s in schedule.milestone_rows %}
+        <tr>
+          <td data-label="Objekt" class="table__title"><a href="{{ s.url }}">{{ s.milestone.label }}</a>{% if not s.has_date %}<span class="table__sub">{% include "partials/marker.html" with m=s.rating text=True %}</span>{% endif %}</td>
+          <td data-label="Ursprünglicher Plan">{{ s.original_date|date:"d.m.Y"|default:"–" }}</td>
+          <td data-label="Genehmigter Plan">{{ s.planned_date|date:"d.m.Y"|default:"–" }}</td>
+          <td data-label="Prognose">{{ s.forecast_date|date:"d.m.Y"|default:"–" }}</td>
+          <td data-label="Ist">{{ s.actual_date|date:"d.m.Y"|default:"–" }}</td>
+          <td data-label="Abweichung">{% include "milestones/_deviation.html" with d=s.deviation %}</td>
+          <td data-label="Freigabe">{% include "partials/marker.html" with m=s.approval_marker text=True %}</td>
+          {% if can_manage %}<td><span class="table__actions"><a class="btn btn--small" href="{% url 'milestones:date_change' project.public_id s.milestone.public_id %}">Prognose/Ist<span class="sr-only"> {{ s.milestone.code }}</span></a></span></td>{% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="card__hint j-hint">Ursprünglicher Plan = erste genehmigte Planversion mit diesem Termin. Genehmigter Plan = aktuell genehmigte Version. Prognose und Ist werden mit Begründung geändert.</p>
+</section>
+
+<div class="j-grid j-grid--2 j-block">
+  <section class="card" aria-labelledby="pv-title">
+    <div class="card__head"><h2 id="pv-title">Planversionen</h2></div>
+    <ul class="plan-list">
+      {% for v in schedule.versions %}
+      <li>
+        <a href="{% url 'milestones:plan' project.public_id v.number %}">Version {{ v.number }}</a>
+        <span class="chip {% if v.is_draft %}chip--optional{% else %}tone-sky{% endif %}">{{ v.get_status_display }}</span>
+        <span class="table__sub">{{ v.reason|default:"ohne Anlass" }}{% if v.approved_by %} · genehmigt von {{ v.approved_by.display_name }}{% if v.approved_as_admin %} (als Administrator){% endif %} am {{ v.approved_at|date:"d.m.Y" }}{% endif %}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="card" aria-labelledby="hist-title">
+    <div class="card__head"><h2 id="hist-title">Verlauf Prognose und Ist</h2><span class="card__hint">nur anfügbar</span></div>
+    {% if schedule.changes %}
+    <ul class="timeline">
+      {% for c in schedule.changes %}
+      <li>
+        <strong>{% if c.milestone %}{{ c.milestone.code }}{% else %}Projekt {{ c.get_point_display }}{% endif %}</strong> · {{ c.get_kind_display }}:
+        {{ c.old_value|date:"d.m.Y"|default:"–" }} → {{ c.new_value|date:"d.m.Y"|default:"–" }}
+        <span class="changes">{{ c.actor.display_name }}{% if c.as_admin %} (als Administrator){% endif %}, <time datetime="{{ c.created_at|date:'c' }}">{{ c.created_at|date:"d.m.Y H:i" }}</time>: {{ c.reason }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+      <p class="muted">Noch keine Änderungen von Prognose oder Ist.</p>
+    {% endif %}
+  </section>
+</div>
+
+{% if schedule.hidden %}
+<section class="card j-block" aria-labelledby="hidden-title">
+  <div class="card__head"><h2 id="hidden-title">Ausgeblendete Meilensteine</h2><span class="card__hint">nicht in Leiste und Menü; Freigaben bleiben erhalten</span></div>
+  <ul class="plan-list">
+    {% for s in schedule.hidden %}
+    <li><a href="{{ s.url }}">{{ s.milestone.label }}</a> {% include "partials/marker.html" with m=s.approval_marker text=True %}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endblock %}

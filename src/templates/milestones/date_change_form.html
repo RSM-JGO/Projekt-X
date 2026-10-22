@@ -1,0 +1,30 @@
+{% extends "app_base.html" %}
+{% block title %}Termin ändern – {{ project.name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div class="page-head__text">
+    <p class="breadcrumb"><a href="{% url 'projects:list' %}">Projekte</a> / <a href="{% url 'projects:detail' project.public_id %}">{{ project.name }}</a> / <a href="{% url 'milestones:schedule' project.public_id %}">Termine & Zeitstrahl</a></p>
+    <h1>{% if milestone %}Prognose oder Ist: {{ milestone.label }}{% else %}Prognose oder Ist: Projektzeitraum{% endif %}</h1>
+    <p class="page-head__meta">
+      {% if milestone %}Aktuell: Prognose {{ milestone.forecast_date|date:"d.m.Y"|default:"–" }} · Ist {{ milestone.actual_date|date:"d.m.Y"|default:"–" }}
+      {% else %}Aktuell: Prognose {{ project.forecast_start_date|date:"d.m.Y"|default:"–" }} bis {{ project.forecast_end_date|date:"d.m.Y"|default:"–" }} · Ist {{ project.actual_start_date|date:"d.m.Y"|default:"–" }} bis {{ project.actual_end_date|date:"d.m.Y"|default:"–" }}{% endif %}
+    </p>
+  </div>
+</div>
+{% if acts_as_admin %}<p class="note note--admin">Du handelst als Administrator. Die Änderung wird protokolliert.</p>{% endif %}
+<section class="card">
+  <form class="form" method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+    {% include "partials/field.html" with field=form.kind %}
+    {% if form.point %}{% include "partials/field.html" with field=form.point %}{% endif %}
+    {% include "partials/field.html" with field=form.value %}
+    {% include "partials/field.html" with field=form.reason %}
+    <p class="card__hint">Jede Änderung erscheint mit altem und neuem Wert, Person und Begründung im Verlauf. Der genehmigte Plan ändert sich dadurch nicht.</p>
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">Speichern</button>
+      <a class="btn btn--ghost" href="{% url 'milestones:schedule' project.public_id %}">Abbrechen</a>
+    </div>
+  </form>
+</section>
+{% endblock %}
