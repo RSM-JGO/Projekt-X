@@ -2,7 +2,8 @@
 <html lang="de" data-theme="light">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {# F23: Zoomen auf Wunsch des Benutzers unterbunden (Entscheidung 005); iOS ignoriert die Sperre teilweise #}
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="color-scheme" content="light dark">
   <title>{% block title %}Projekt X{% endblock %} – Projekt X</title>
   <link rel="stylesheet" href="{% static 'css/app.css' %}">

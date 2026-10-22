@@ -136,7 +136,7 @@ window.PX_DATA = {
   tasks: [
     /* Filialnetz Upgrade */
     {
-      id: "t-101", projectId: "filialnetz", bucketId: "planung", milestoneId: "fn-m2",
+      id: "t-101", projectId: "filialnetz", bucketId: "planung", milestoneId: "fn-m2", priority: "hoch",
       title: "Hardwareliste Welle 3 abstimmen", due: "2026-10-16", status: "offen",
       assigneeIds: ["u-jan", "u-mara"],
       description: "Gerätetypen und Stückzahlen für die 40 Beispielfilialen der Welle 3 mit dem Einkauf abstimmen.",

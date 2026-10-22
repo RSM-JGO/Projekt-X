@@ -23,11 +23,13 @@ Status: Offen, In Arbeit, Zur Prüfung, Erledigt. Ein technischer Nachweis und e
 1. V07b gemeinsame Aufgaben abschließen und abnehmen.
 2. Arbeitsplatz-Aufbau anhand der echten Version überarbeiten.
 3. Erledigt: Externe Demo-Ansicht inkl. F16 Versionsanzeige, vom Benutzer am 21.10.2026 abgenommen (docs/auftrag-demo-ansicht.md).
-4. Meilensteine und Termine mit Plan, Prognose, Ist und Freigabe.
-5. Aufgaben erweitern: Kommentare, Anhänge, Board, Kalender, Priorität, Status „In Arbeit“, Buckets archivieren (Priorität und In Arbeit vom Benutzer am 21.10.2026 bestätigt).
-6. Management-Übersicht.
-7. Statusbericht und PDF, vorher PDF-Prototyp W-C.
-8. Tägliche Erinnerungsmails.
+4. **Neu geplant nach Entscheidung 006 (22.10.2026), Details in docs/plan-umsetzung-projektbereich.md:** zuerst Datenmodell-Konzept, dann 4a Projektnavigation, Meilensteine und Termine; 4b Steckbrief & Auftrag.
+5. Aufgabenboard neu: Status-Kanban, Ziehen, Priorität, Kommentare, Filter; Anhänge und Kalender später.
+6. Kommunikation: Stakeholder, Kommunikationsmatrix, RACI (F20, F21).
+7. Risiken & Chancen (F11).
+8. Änderungen & Entscheidungen.
+9. Produkt & Pilot, Berichte und PDF (vorher PDF-Prototyp W-C), Dokumente, Abschluss.
+10. Management-Übersicht, tägliche Erinnerungsmails, Monitoring F17, Logo-Animation F18.
 
 Nebenbei: GitHub-Upload nur nach Freigabe, CI, später Umzug auf den Server des Arbeitgebers. Jede Etappe: Kriterien, Umsetzung, Prüfung und Review, Benutzerabnahme, Commit.
 
@@ -49,7 +51,9 @@ Alle Einträge sind offen. Die Liste bündelt Themen, enthält aber noch keine v
   - **Konkretisiert durch Wunsch des Benutzers vom 21.10.2026:** Risiken je Projekt aufnehmen und in einer **Risiko-Matrix** pflegen (Eintrittswahrscheinlichkeit × Auswirkung). Felder pro Risiko z. B. Beschreibung, Verantwortliche, Maßnahmen und Status.
   - **Farbregeln:** Rot = hoch, Orange = mittel, Grün = niedrig; ohne Bewertung grau, nie grün.
   - **Verlauf:** Änderungen der Bewertung bleiben nachvollziehbar; spätere Übernahme in Statusberichte.
-  - **Offen:** Skala (3×3 oder 5×5), Pflichtfelder, ob Chancen ebenfalls erfasst werden.
+  - **Skala:** 3×3, vom Benutzer am 21.10.2026 entschieden.
+  - **Chancen:** werden mit den Risiken erfasst; Bewertung zusätzlich nach zeitlicher Nähe (Orientierung des Benutzers vom 22.10.2026).
+  - **Offen:** Pflichtfelder.
   - **Einordnung:** Baustein der Projekt-Journey F19, Umsetzung nach der Konzeptentscheidung.
 - F12: Allgemeines Phasenmodell und Abschlussdokumente; ausdrücklich noch nicht festgelegt.
 - F13: Betrieb, Sicherung, Wiederherstellung und Teamfreigabe.
@@ -58,6 +62,15 @@ Alle Einträge sind offen. Die Liste bündelt Themen, enthält aber noch keine v
 - F16: Versionsanzeige (Wunsch des Benutzers vom 21.10.2026, vom Product Owner konkretisiert): dezent im Fußbereich jeder angemeldeten Seite und in `/health/`, z. B. „Projekt X 0.1.0 · a1b2c3d · dev“. Die Version kommt aus `pyproject.toml`, der Commit wird beim Start ermittelt, die Umgebung kommt aus der Konfiguration. Zusatz „geändert“ bei uncommitteten Änderungen, „unbekannt“ ohne Commit. Ein automatischer Vergleich mit dem neuesten Release kommt erst mit Release-Quelle und CI. **Eingeordnet in Etappe 3** (Demo), weil Betrachter den gezeigten Stand erkennen sollen.
   - **Änderung durch den Benutzer am 21.10.2026:** schlichteres Format „Version: 0.1.0-2f9337e“. Ungespeicherte Änderungen werden mit „*“ markiert, die Erklärung und die Umgebung stehen im Tooltip.
 - F22: Passwort bei der Eingabe anzeigen (Wunsch des Benutzers vom 21.10.2026): Umschalter „anzeigen/verbergen“ am Passwortfeld der Anmeldung und überall, wo Passwörter eingegeben werden. Bedienbar per Tastatur, mit Screenreader-Beschriftung, Standard ist verborgen. Umgesetzt am 21.10.2026 (Anmeldeseite, im Browser geprüft).
+- F23: Ungewolltes Zoomen in der mobilen Ansicht verhindern (Wunsch des Benutzers vom 21.10.2026).
+  - **Hinweis Product Owner/Projektleiter:** Zoomen komplett zu sperren (`user-scalable=no`, `maximum-scale=1`) wird nicht empfohlen. Es verstößt gegen die Barrierefreiheit (WCAG 1.4.4: Menschen mit Sehschwäche müssen vergrößern können), und iPhones ignorieren die Sperre ohnehin.
+  - **Vorgeschlagene Lösung:** die typischen Ursachen beheben.
+    - Eingabefelder mit mindestens 16 px Schrift, damit iOS beim Antippen nicht automatisch hineinzoomt.
+    - `touch-action: manipulation` gegen Doppeltipp-Zoom auf Buttons.
+    - Kein Inhalt breiter als der Bildschirm.
+  - **Abnahme:** Antippen von Feldern und Buttons auf iPhone und Android löst kein Zoomen aus; bewusstes Zwei-Finger-Zoomen bleibt möglich.
+  - **Entscheidung des Benutzers (005):** jedes Zoomen unterbinden. Umgesetzt am 21.10.2026 mit Viewport-Sperre, 16-px-Feldern und `touch-action`. Hinweis zu WCAG und iOS ist dokumentiert.
+  - **Einordnung:** klein, mit der nächsten Oberflächenetappe.
 - F17: Betriebsübersicht und Monitoring (Wunsch des Benutzers vom 21.10.2026, vom Product Owner konkretisiert, Vorschlag).
   - **Stufen:** 1a Admin-Seite mit App- und DB-Status, Version (F16), letzten Fehlern und Anmeldesperren; 1b mit Etappe 8 der Scheduler-Lauf und Reminder-Zustände einschließlich UNKLAR; 1c mit Server und F13 Sicherung und Wiederherstellungsprobe; 2 externer Verfügbarkeits-Check mit Alarm (externer Dienst nur nach Freigabe); 3 Server-Monitoring beim Arbeitgeber.
   - **Abnahme 1a:** nur Administratoren (Backend 403 bzw. Umleitung zur Anmeldung); fehlende oder veraltete Angaben nie grün; Fehler ohne Geheimnisse; `/health/` bleibt knapp; Tests.
@@ -68,14 +81,14 @@ Alle Einträge sind offen. Die Liste bündelt Themen, enthält aber noch keine v
   - **Abnahme:** Bei „Bewegung reduzieren“ sofort sichtbar; blockiert die Anmeldung nie und lässt sich überspringen; Hell/Dunkel und offline; Screenreader liest „Projekt X“; ohne JavaScript nutzbar; keine Animation auf angemeldeten Seiten.
   - **Einordnung:** niedrige Priorität, als Zusatz zu Etappe 2 oder direkt nach Etappe 3.
   - **Offene Fragen an den Benutzer:** bei jedem Öffnen oder einmal je Sitzung? SVG-Nachbau mit Vorschau zur Abstimmung?
-- F19: Projekt-Journey und Menüstruktur des Projektbereichs (Wunsch des Benutzers vom 21.10.2026, Konzeptaufgabe, vom Product Owner konkretisiert, Vorschlag).
+- F19: Projekt-Journey und Menüstruktur des Projektbereichs. **Konzept erledigt:** Skizze v3 vom Benutzer am 22.10.2026 angenommen, Entscheidung 006.
   - **Ziel:** ein geführter Weg von Projektstart bis Abschluss.
   - **Bausteine:** Steckbrief, Stakeholder, RACI, Meilensteine und Termine, Aufgaben, Risiken, Entscheidungen und Freigaben, Statusberichte, Dokumente, Abschluss und Lessons Learned.
   - **Abgrenzung:** Die Journey ordnet nur die Navigation und beschließt kein Phasenmodell (F12 bleibt offen).
   - **Ergebnis:** klickbare Menü- und Journey-Skizze in design/ mit Beispieldaten und eine Entscheidungsvorlage mit 2 Varianten; kein Produktivcode.
   - **Einordnung (Empfehlung PO):** vor Etappe 4, weil die Menüstruktur alle weiteren Projektbereiche prägt.
 - F20: Stakeholderregister und -matrix je Projekt: Name, Organisation, fachliche Rolle, Einfluss und Interesse. Ohne Benutzerkonto und ohne Zugriff. Hängt von F19 ab.
-- F21: RACI-Matrix: Personen bzw. Stakeholder gegen Bezugsobjekte. Ob sich die Matrix auf Aufgaben, Meilensteine, Entscheidungen oder eigene Arbeitspakete bezieht, ist offen. Hängt von F19 und F20 ab.
+- F21: RACI-Matrix, **rollenbasiert** (Benutzer am 21.10.2026): welche Projektrolle welche Verantwortung je Aktivität trägt (R/A/C/I). Die Rollen kommen aus dem Rollout-Handbuch des Benutzers. Sie gehört mit dem Stakeholderregister in den Bereich „Kommunikation“. Hängt von F19 und F20 ab.
 - Offene Fragen zu F19 bis F21: Soll die Journey nur Orientierung geben oder auch Schritte vorgeben? Worauf bezieht sich RACI? Kommt F19 vor Etappe 4?
 
 ## Vorlage für ein entwicklungsfertiges Ticket

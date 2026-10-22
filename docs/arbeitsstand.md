@@ -70,3 +70,10 @@ Freigabe der Installationsliste, Django-Version (W-B), PDF-Verfahren (W-C), Vari
 ## Wiederaufnahme
 
 In einem neuen Chat zuerst CLAUDE.md, README.md und diese Datei lesen, danach Backlog und relevante Entscheidungen. Ein Entwurf oder ein früherer Vorschlag ist keine Benutzerfreigabe. Den aktuellen Git-Zustand vor Änderungen prüfen. Änderungen an diesem Arbeitsstand mit konkreten Nachweisen ergänzen.
+
+## Stand 22.10.2026
+
+- **Auf GitHub hochgeladen** (21.10.2026): die Commits bis `5bcc564`, Repository privat, vom Benutzer bestätigt.
+- **F22** „Passwort anzeigen“ umgesetzt. **F23** Zoomen mobil unterbunden (Entscheidung 005; Hinweis zu WCAG und iOS dokumentiert).
+- **F19** Projekt-Journey und Menüstruktur: Skizze v1 bis v3 in `design/`; **v3 vom Benutzer angenommen**, Entscheidung 006. Fachliche Orientierung M0–M5 in `docs/fachliche-orientierung-projektablauf.md`.
+- **Nächster Schritt:** Umsetzungsplan `docs/plan-umsetzung-projektbereich.md`. Zuerst das Datenmodell-Konzept (Softwarearchitekt), dann Etappe 4a (Navigation, Meilensteine, Termine). Offene Fragen an den Benutzer stehen im Plan.

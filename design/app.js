@@ -8,7 +8,7 @@
   "use strict";
 
   var DATA = window.PX_DATA;
-  var TASK_STORE_KEY = "px-design-tasks-v1";
+  var TASK_STORE_KEY = "px-design-tasks-v2";
   var THEME_KEY = "px-design-theme";
   var DAY_MS = 86400000;
 
@@ -26,31 +26,42 @@
 
   /* ---------------- Zustand ---------------- */
 
-  function cloneTasks() {
-    return JSON.parse(JSON.stringify(DATA.tasks));
+  function normalizeTask(t) {
+    if (!t.priority) { t.priority = "mittel"; }
+    if (typeof t.description !== "string") { t.description = ""; }
+    return t;
   }
 
+  function cloneTasks() {
+    return JSON.parse(JSON.stringify(DATA.tasks)).map(normalizeTask);
+  }
+
+  // Gespeicherter Stand (inkl. neu angelegter und gelöschter Aufgaben); bei ungültigen Daten Ausgangszustand
   function loadTasks() {
     var raw = storageGet(TASK_STORE_KEY);
     if (!raw) { return cloneTasks(); }
     try {
       var stored = JSON.parse(raw);
-      var ids = DATA.tasks.map(function (t) { return t.id; }).join("|");
-      var storedIds = Array.isArray(stored) ? stored.map(function (t) { return t && t.id; }).join("|") : "";
-      if (ids !== storedIds) { return cloneTasks(); }
+      if (!Array.isArray(stored)) { return cloneTasks(); }
       var valid = stored.every(function (t) {
-        return Array.isArray(t.assigneeIds) && Array.isArray(t.history) && Array.isArray(t.comments) &&
-          (t.status === "offen" || t.status === "erledigt");
+        return t && typeof t.id === "string" && typeof t.title === "string" &&
+          Array.isArray(t.assigneeIds) && Array.isArray(t.history) && Array.isArray(t.comments) &&
+          (t.projectId === null || typeof t.projectId === "string") &&
+          (t.status === "offen" || t.status === "in-arbeit" || t.status === "erledigt");
       });
-      return valid ? stored : cloneTasks();
+      return valid ? stored.map(normalizeTask) : cloneTasks();
     } catch (e) {
       return cloneTasks();
     }
   }
 
+  function defaultKanban() {
+    return { view: "board", sort: "asc", q: "", bucket: "", person: "", milestone: "", priority: "", mine: false };
+  }
+
   var state = {
     tasks: loadTasks(),
-    projectFilter: "offen",
+    kanban: defaultKanban(),
     openTaskId: null,
     lastRouteKey: null
   };
@@ -188,6 +199,9 @@
   }
 
   function taskStatusBadge(task) {
+    if (task.status === "in-arbeit") {
+      return '<span class="badge tone-sky"><span class="badge__icon" aria-hidden="true"><span>◐</span></span>In Arbeit</span>';
+    }
     if (task.status === "erledigt") {
       return '<span class="badge tone-mint"><span class="badge__icon" aria-hidden="true"><span>✓</span></span>Erledigt</span>';
     }
@@ -401,31 +415,6 @@
 
   /* ---------------- Ansicht: Projektdetail ---------------- */
 
-  var FILTERS = [
-    { key: "offen", label: "Offen" },
-    { key: "erledigt", label: "Erledigt" },
-    { key: "alle", label: "Alle" }
-  ];
-
-  function matchesFilter(task) {
-    if (state.projectFilter === "alle") { return true; }
-    return task.status === state.projectFilter;
-  }
-
-  function taskCard(task, project) {
-    var m = getMilestone(project, task.milestoneId);
-    var due = dueInfo(task);
-    var done = task.status === "erledigt";
-    return '<li><button type="button" class="task-card' + (done ? " is-done" : "") +
-      '" data-action="open-task" data-task-id="' + esc(task.id) + '">' +
-      '<span class="task-card__title">' + stateDot(task) + "<span>" + esc(task.title) + "</span></span>" +
-      '<span class="task-card__meta">' +
-        (m ? '<span class="chip tone-brand">◆ ' + esc(m.name) + "</span>" : '<span class="chip tone-neutral">Ohne Meilenstein</span>') +
-        '<span class="due ' + due.cls + '">' + esc(due.text) + "</span>" +
-      "</span>" +
-      '<span class="task-card__foot">' + avatarGroup(task.assigneeIds) + taskStatusBadge(task) + "</span>" +
-      "</button></li>";
-  }
 
   function milestoneTable(project) {
     var rows = project.milestones.map(function (m) {
@@ -451,66 +440,227 @@
       "</section>";
   }
 
-  function renderProject(id) {
+  /* ---------------- Aufgabenboard (F19 v3): Kanban nach Status ---------------- */
+
+  var STATUS_COLUMNS = [
+    { key: "offen", label: "Offen" },
+    { key: "in-arbeit", label: "In Arbeit" },
+    { key: "erledigt", label: "Erledigt" }
+  ];
+  var STATUS_LABEL = { "offen": "Offen", "in-arbeit": "In Arbeit", "erledigt": "Erledigt" };
+
+  function projectTasks(p) {
+    return state.tasks.filter(function (t) { return t.projectId === p.id; });
+  }
+
+  function taskStats(p) {
+    var tasks = projectTasks(p);
+    return {
+      open: tasks.filter(function (t) { return t.status !== "erledigt"; }).length,
+      inProgress: tasks.filter(function (t) { return t.status === "in-arbeit"; }).length,
+      overdue: tasks.filter(function (t) { return t.status !== "erledigt" && daysFromToday(t.due) < 0; }).length
+    };
+  }
+
+  function kanbanFiltered(p) {
+    var f = state.kanban;
+    var q = f.q.toLowerCase();
+    var list = projectTasks(p).filter(function (t) {
+      if (f.bucket && t.bucketId !== f.bucket) { return false; }
+      if (f.person && t.assigneeIds.indexOf(f.person) === -1) { return false; }
+      if (f.milestone && t.milestoneId !== f.milestone) { return false; }
+      if (f.priority && (t.priority || "mittel") !== f.priority) { return false; }
+      if (f.mine && t.assigneeIds.indexOf(me.id) === -1) { return false; }
+      if (q && (t.title + " " + (t.description || "")).toLowerCase().indexOf(q) === -1) { return false; }
+      return true;
+    });
+    list.sort(function (a, b) { return f.sort === "desc" ? byDue(b, a) : byDue(a, b); });
+    return list;
+  }
+
+  // Fälligkeit: überfällig rot, heute orange (nur offene Aufgaben), mit Symbol und Text
+  function kanbanDue(task) {
+    if (task.status === "erledigt") { return '<span class="muted">Fällig war ' + esc(fmtDate(task.due)) + "</span>"; }
+    var diff = daysFromToday(task.due);
+    if (diff < 0) {
+      return '<span class="badge tone-rose"><span class="badge__icon" aria-hidden="true"><span>!</span></span>überfällig · ' + esc(fmtDate(task.due)) + "</span>";
+    }
+    if (diff === 0) {
+      return '<span class="badge tone-peach"><span class="badge__icon" aria-hidden="true"><span>●</span></span>heute fällig</span>';
+    }
+    return "<span>Fällig " + esc(fmtDate(task.due)) + "</span>";
+  }
+
+  // Priorität ist kein Status: neutrale Darstellung mit Symbol und Text
+  function priorityChip(task) {
+    var pr = priorityDef(task.priority);
+    return '<span class="chip chip--prio chip--prio-' + pr.key + '"><span aria-hidden="true">' + pr.icon + "</span> Priorität " + esc(pr.label) + "</span>";
+  }
+
+  function statusSelect(task) {
+    return '<label class="kb-status"><span class="sr-only">Status von „' + esc(task.title) + '“ ändern</span>' +
+      '<select data-kanban-status="' + esc(task.id) + '">' +
+      STATUS_COLUMNS.map(function (c) {
+        return '<option value="' + c.key + '"' + (task.status === c.key ? " selected" : "") + ">" + esc(c.label) + "</option>";
+      }).join("") + "</select></label>";
+  }
+
+  function kanbanCard(task, p) {
+    var b = getBucket(p, task.bucketId);
+    var m = getMilestone(p, task.milestoneId);
+    var done = task.status === "erledigt";
+    return '<li class="kb-card' + (done ? " is-done" : "") + '" draggable="true" data-task-id="' + esc(task.id) + '">' +
+      '<button type="button" class="kb-card__title" data-action="open-task" data-task-id="' + esc(task.id) + '">' + esc(task.title) + "</button>" +
+      '<div class="kb-card__meta">' + kanbanDue(task) + priorityChip(task) + "</div>" +
+      (done ? '<p class="kb-card__done">' + esc(lastCompletionText(task)) + "</p>" : "") +
+      '<div class="kb-card__chips">' +
+        (b ? '<span class="chip tone-neutral">' + esc(b.name) + "</span>" : "") +
+        (m ? '<span class="chip tone-brand">◆ ' + esc(m.name) + "</span>" : '<span class="chip chip--quiet">ohne Meilenstein</span>') +
+      "</div>" +
+      '<div class="kb-card__foot">' + avatarGroup(task.assigneeIds) + statusSelect(task) + "</div>" +
+      "</li>";
+  }
+
+  function kanbanFilters(p, shown, total) {
+    var f = state.kanban;
+    var people = [];
+    projectTasks(p).forEach(function (t) {
+      t.assigneeIds.forEach(function (id) { if (people.indexOf(id) === -1) { people.push(id); } });
+    });
+    function select(name, label, options, value) {
+      return '<label class="kb-filter"><span>' + esc(label) + '</span><select data-kanban-filter="' + name + '">' +
+        '<option value="">Alle</option>' +
+        options.map(function (o) {
+          return '<option value="' + esc(o.value) + '"' + (o.value === value ? " selected" : "") + ">" + esc(o.label) + "</option>";
+        }).join("") + "</select></label>";
+    }
+    return '<p class="kb-concept" role="note">Konzeptskizze: Anlegen, Bearbeiten und Verschieben wirken nur in diesem Browser. „Beispieldaten zurücksetzen“ stellt den Ausgangszustand wieder her.</p>' +
+      '<div class="kb-toolbar">' +
+      '<div class="kb-filters" role="group" aria-label="Aufgaben filtern">' +
+        '<label class="kb-filter kb-filter--search"><span>Suche</span><input type="search" data-kanban-filter="q" value="' + esc(f.q) + '" placeholder="Titel oder Beschreibung"></label>' +
+        select("bucket", "Bucket", p.buckets.map(function (b) { return { value: b.id, label: b.name }; }), f.bucket) +
+        select("person", "Person", people.map(function (id) { return { value: id, label: userName(id) }; }), f.person) +
+        select("milestone", "Meilenstein", p.milestones.map(function (m) { return { value: m.id, label: m.name }; }), f.milestone) +
+        select("priority", "Priorität", PRIORITIES.map(function (x) { return { value: x.key, label: x.label }; }), f.priority) +
+        '<label class="kb-check"><input type="checkbox" data-kanban-filter="mine"' + (f.mine ? " checked" : "") + "> nur meine</label>" +
+      "</div>" +
+      '<div class="kb-toolbar__right"><span class="muted kb-shown" aria-live="polite">' + shown + " von " + total + " Aufgaben</span>" +
+        '<div class="segmented" role="group" aria-label="Ansicht">' +
+          '<button type="button" data-action="kanban-view" data-view="board" aria-pressed="' + (f.view === "board") + '">Board</button>' +
+          '<button type="button" data-action="kanban-view" data-view="list" aria-pressed="' + (f.view === "list") + '">Liste</button>' +
+        "</div></div>" +
+      "</div>";
+  }
+
+  function quickAdd(col) {
+    return '<form class="kb-quick" data-kanban-quick="' + col.key + '">' +
+      '<label class="sr-only" for="kb-new-' + col.key + '">Neue Aufgabe in „' + esc(col.label) + '“</label>' +
+      '<input id="kb-new-' + col.key + '" type="text" maxlength="200" placeholder="+ Aufgabe (Titel, Enter)" autocomplete="off">' +
+      "</form>";
+  }
+
+  // Aufgabenbereich: Board (Spalten Offen/In Arbeit/Erledigt) oder Liste
+  function taskBoard(p) {
+    var all = projectTasks(p);
+    var tasks = kanbanFiltered(p);
+    var body;
+    if (state.kanban.view === "list") {
+      var sortLabel = state.kanban.sort === "desc" ? "absteigend" : "aufsteigend";
+      body = tasks.length
+        ? '<div class="table-wrap table-wrap--cards"><table class="table table--cards kb-table"><caption class="sr-only">Aufgaben als Liste, sortiert nach Fälligkeit ' + sortLabel + "</caption>" +
+          '<thead><tr><th scope="col">Aufgabe</th><th scope="col">Status</th>' +
+          '<th scope="col" aria-sort="' + (state.kanban.sort === "desc" ? "descending" : "ascending") + '"><button type="button" class="kb-sort" data-action="kanban-sort">Fälligkeit ' +
+            (state.kanban.sort === "desc" ? "▼" : "▲") + '<span class="sr-only"> (' + sortLabel + ", zum Umkehren klicken)</span></button></th>" +
+          '<th scope="col">Priorität</th><th scope="col">Zuständig</th><th scope="col">Bucket</th><th scope="col">Meilenstein</th></tr></thead><tbody>' +
+          tasks.map(function (t) {
+            var b = getBucket(p, t.bucketId);
+            var m = getMilestone(p, t.milestoneId);
+            return '<tr><td data-label="Aufgabe"><button type="button" class="kb-card__title" data-action="open-task" data-task-id="' + esc(t.id) + '">' + esc(t.title) + "</button></td>" +
+              '<td data-label="Status">' + statusSelect(t) + "</td>" +
+              '<td data-label="Fälligkeit">' + kanbanDue(t) + "</td>" +
+              '<td data-label="Priorität">' + priorityChip(t) + "</td>" +
+              '<td data-label="Zuständig">' + avatarGroup(t.assigneeIds) + "</td>" +
+              '<td data-label="Bucket">' + (b ? esc(b.name) : "–") + "</td>" +
+              '<td data-label="Meilenstein">' + (m ? esc(m.name) : '<span class="muted">–</span>') + "</td></tr>";
+          }).join("") + "</tbody></table></div>"
+        : emptyState("∅", "Keine Aufgaben für diese Filter", "", "");
+    } else {
+      body = '<div class="kb-board">' + STATUS_COLUMNS.map(function (c) {
+        var inCol = tasks.filter(function (t) { return t.status === c.key; });
+        return '<section class="kb-col" data-kanban-drop="' + c.key + '" aria-labelledby="kb-h-' + c.key + '">' +
+          '<header class="kb-col__head"><h3 id="kb-h-' + c.key + '">' + esc(c.label) + '</h3><span class="kb-count"><span class="sr-only">Anzahl: </span>' + inCol.length + "</span></header>" +
+          quickAdd(c) +
+          (inCol.length
+            ? '<ul class="kb-list">' + inCol.map(function (t) { return kanbanCard(t, p); }).join("") + "</ul>"
+            : '<p class="bucket__empty">Hierher ziehen oder Status ändern</p>') +
+          "</section>";
+      }).join("") + "</div>" +
+      '<p class="card__hint kb-hint">Karten lassen sich zwischen den Spalten ziehen. Ohne Maus: Status über die Auswahl auf der Karte ändern. Karte anklicken öffnet das Detailpanel zum Bearbeiten.</p>';
+    }
+    return kanbanFilters(p, tasks.length, all.length) + body;
+  }
+
+  function setTaskStatus(id, status) {
+    var task = getTask(id);
+    if (!task || !STATUS_LABEL[status] || task.status === status) { return; }
+    if (status === "erledigt") {
+      task.history.push({ type: "completed", by: me.id, at: stampNow() });
+    } else if (task.status === "erledigt") {
+      task.history.push({ type: "reopened", by: me.id, at: stampNow() });
+    } else if (status === "in-arbeit") {
+      task.history.push({ type: "started", by: me.id, at: stampNow() });
+    }
+    task.status = status;
+    saveTasks();
+    renderRoute(false);
+    var select = document.querySelector('#main [data-kanban-status="' + id + '"]');
+    if (select) { select.focus(); }
+    toast("„" + task.title + "“: " + STATUS_LABEL[status] + (status === "erledigt" ? " – " + lastCompletionText(task) : "") + ".");
+  }
+
+  function quickCreate(p, status, title) {
+    var f = state.kanban;
+    var due = new Date(TODAY + 7 * DAY_MS);
+    var task = {
+      id: "t-neu-" + new Date().getTime(),
+      projectId: p.id,
+      bucketId: f.bucket || p.buckets[0].id,
+      milestoneId: f.milestone || null,
+      title: title,
+      due: due.getUTCFullYear() + "-" + pad(due.getUTCMonth() + 1) + "-" + pad(due.getUTCDate()),
+      status: status,
+      priority: f.priority || "mittel",
+      assigneeIds: [me.id],
+      description: "",
+      comments: [],
+      history: [{ type: "created", by: me.id, at: stampNow() }]
+    };
+    if (status === "erledigt") { task.history.push({ type: "completed", by: me.id, at: stampNow() }); }
+    state.tasks.push(task);
+    saveTasks();
+    renderRoute(false);
+    var input = document.getElementById("kb-new-" + status);
+    if (input) { input.focus(); }
+    toast("Aufgabe „" + title + "“ angelegt (nur in diesem Browser).");
+  }
+
+  function renderProject(id, section, ms) {
     var p = projectsById[id];
     if (!p) {
       return '<div class="page-head"><h1 tabindex="-1">Projekt nicht gefunden</h1></div>' +
         emptyState("?", "Dieses Beispielprojekt gibt es nicht", "Der Link verweist auf kein Projekt in den Beispieldaten.",
           '<a class="btn" href="#/projekte">Zur Projektübersicht</a>');
     }
-    var tasks = state.tasks.filter(function (t) { return t.projectId === p.id; });
-    var counts = {
-      offen: tasks.filter(function (t) { return t.status === "offen"; }).length,
-      erledigt: tasks.filter(function (t) { return t.status === "erledigt"; }).length,
-      alle: tasks.length
-    };
-    var visible = tasks.filter(matchesFilter).sort(byDue);
     var lead = usersById[p.leadId];
-
-    var filterButtons = FILTERS.map(function (f) {
-      return '<button type="button" data-action="set-filter" data-filter="' + f.key + '" aria-pressed="' +
-        (state.projectFilter === f.key ? "true" : "false") + '">' + esc(f.label) +
-        ' <span class="segmented__count">(' + counts[f.key] + ")</span></button>";
-    }).join("");
-
-    var board;
-    if (!visible.length) {
-      var filterLabel = state.projectFilter === "erledigt" ? "erledigten" : (state.projectFilter === "offen" ? "offenen" : "");
-      board = emptyState("∅", "Keine " + filterLabel + " Aufgaben",
-        "Für diesen Filter gibt es in diesem Projekt keine Aufgaben.",
-        state.projectFilter !== "alle" ? '<button type="button" class="btn" data-action="set-filter" data-filter="alle">Alle Aufgaben anzeigen</button>' : "");
-    } else {
-      board = '<div class="board">' + p.buckets.map(function (b) {
-        var inBucket = visible.filter(function (t) { return t.bucketId === b.id; });
-        return '<section class="bucket" aria-label="Bucket ' + esc(b.name) + '">' +
-          '<div class="bucket__head"><h3>' + esc(b.name) + '</h3><span class="bucket__count">' + inBucket.length + " " +
-            plural(inBucket.length, "Aufgabe", "Aufgaben") + "</span></div>" +
-          (inBucket.length
-            ? '<ul class="task-list">' + inBucket.map(function (t) { return taskCard(t, p); }).join("") + "</ul>"
-            : '<p class="bucket__empty">Keine Aufgaben in diesem Filter</p>') +
-          "</section>";
-      }).join("") + "</div>";
-    }
-
-    return '<p class="breadcrumb"><a href="#/projekte">Projekte</a> <span aria-hidden="true">›</span> <span class="muted">' + esc(p.name) + "</span></p>" +
-      '<section class="card card--project" aria-labelledby="p-title">' +
-        '<div class="project-head"><div>' +
-          '<h1 id="p-title" tabindex="-1">' + esc(p.name) + "</h1>" +
-          '<p class="muted project-head__goal">' + esc(p.goal) + "</p>" +
-        "</div>" + statusBadge(effectiveStatus(p)) + "</div>" +
-        '<dl class="facts">' +
-          "<div><dt>Zeitraum</dt><dd>" + esc(fmtDate(p.start)) + " – " + esc(fmtDate(p.end)) + "</dd></div>" +
-          "<div><dt>Projektleitung</dt><dd>" + esc(lead ? lead.name : "–") + "</dd></div>" +
-          "<div><dt>Auftraggeber</dt><dd>" + esc(p.sponsor) + "</dd></div>" +
-          "<div><dt>Letzter Statusbericht</dt><dd>" + reportCell(p) + "</dd></div>" +
-        "</dl>" +
-      "</section>" +
-
-      '<div class="toolbar"><h2>Aufgaben nach Bucket</h2>' +
-        '<div class="segmented" role="group" aria-label="Aufgaben filtern">' + filterButtons + "</div>" +
-      "</div>" +
-      board +
-      milestoneTable(p);
+    // Kompakter Projektkopf (F19 v3): Name, Status, Eckdaten in einer Zeile
+    return journey.band() +
+      '<p class="breadcrumb"><a href="#/projekte">Projekte</a> <span aria-hidden="true">›</span> <span class="muted">' + esc(p.name) + "</span></p>" +
+      '<header class="project-compact">' +
+        '<div class="project-compact__title"><h1 id="p-title" tabindex="-1">' + esc(p.name) + "</h1>" + statusBadge(effectiveStatus(p)) + "</div>" +
+        '<p class="project-compact__facts muted">' + esc(fmtDate(p.start)) + " – " + esc(fmtDate(p.end)) +
+          " · Projektleitung " + esc(lead ? lead.name : "–") + " · Auftraggeber " + esc(p.sponsor) + "</p>" +
+      "</header>" +
+      journey.render(p, section, ms);
   }
 
   /* ---------------- Ansicht: Management ---------------- */
@@ -573,59 +723,162 @@
     var when = '<time>' + esc(fmtDateTime(h.at)) + "</time>";
     if (h.type === "completed") { return "Abgeschlossen von " + who + " am " + when; }
     if (h.type === "reopened") { return "Wiedergeöffnet von " + who + " am " + when; }
+    if (h.type === "started") { return "In Arbeit genommen von " + who + " am " + when; }
+    if (h.type === "edited") { return "Bearbeitet von " + who + " am " + when; }
     return "Erstellt von " + who + " am " + when;
   }
 
+  var PRIORITIES = [
+    { key: "hoch", label: "hoch", icon: "▲" },
+    { key: "mittel", label: "mittel", icon: "■" },
+    { key: "niedrig", label: "niedrig", icon: "▼" }
+  ];
+
+  function priorityDef(key) {
+    return PRIORITIES.filter(function (x) { return x.key === key; })[0] || PRIORITIES[1];
+  }
+
+  function stampNow() {
+    var now = new Date();
+    return DATA.meta.today + " " + pad(now.getHours()) + ":" + pad(now.getMinutes());
+  }
+
+  function lastCompletionText(task) {
+    var c = lastCompletion(task);
+    return c ? "Abgeschlossen von " + userName(c.by) + " am " + fmtDateTime(c.at) : "";
+  }
+
+  // Detailpanel zum Bearbeiten (Konzeptskizze: Änderungen nur in diesem Browser)
   function renderDialog(task) {
     var p = task.projectId ? projectsById[task.projectId] : null;
     var b = getBucket(p, task.bucketId);
-    var m = getMilestone(p, task.milestoneId);
-    var due = dueInfo(task);
     var done = task.status === "erledigt";
 
-    var comments = task.comments.length
-      ? '<ul class="comments">' + task.comments.map(function (c) {
-          return '<li class="comment">' + avatar(c.by, false) + '<div class="comment__bubble"><p class="comment__meta">' +
-            esc(userName(c.by)) + " · " + esc(fmtDateTime(c.at)) + "</p><p>" + esc(c.text) + "</p></div></li>";
-        }).join("") + "</ul>"
-      : '<p class="muted">Noch keine Kommentare.</p>';
+    function option(value, label, selected) {
+      return '<option value="' + esc(value) + '"' + (selected ? " selected" : "") + ">" + esc(label) + "</option>";
+    }
+
+    var comments = '<ul class="comments" id="tf-comments">' + task.comments.map(function (c) {
+      return '<li class="comment">' + avatar(c.by, false) + '<div class="comment__bubble"><p class="comment__meta">' +
+        esc(userName(c.by)) + " · " + esc(fmtDateTime(c.at)) + "</p><p>" + esc(c.text) + "</p></div></li>";
+    }).join("") + "</ul>";
 
     var history = task.history.slice().reverse().map(function (h) {
       return '<li class="is-' + esc(h.type) + '">' + historyText(h) + "</li>";
     }).join("");
 
-    var people = '<ul class="people">' + task.assigneeIds.map(function (id) {
-      return "<li>" + avatar(id, false) + "<span>" + esc(userName(id)) + "</span></li>";
-    }).join("") + "</ul>";
+    var projectFields = p
+      ? '<div class="dlg-row">' +
+          '<div class="dlg-field"><label for="tf-bucket">Bucket</label><select id="tf-bucket" name="bucket">' +
+            p.buckets.map(function (x) { return option(x.id, x.name, x.id === task.bucketId); }).join("") + "</select></div>" +
+          '<div class="dlg-field"><label for="tf-ms">Meilenstein</label><select id="tf-ms" name="milestone">' +
+            option("", "kein Meilenstein", !task.milestoneId) +
+            p.milestones.map(function (x) { return option(x.id, x.name, x.id === task.milestoneId); }).join("") + "</select></div>" +
+        "</div>" +
+        '<fieldset class="dlg-field dlg-people"><legend>Zuständig (mehrere möglich)</legend>' +
+          DATA.users.map(function (u) {
+            return '<label class="dlg-check"><input type="checkbox" name="assignee" value="' + esc(u.id) + '"' +
+              (task.assigneeIds.indexOf(u.id) !== -1 ? " checked" : "") + "> " + esc(u.name) + "</label>";
+          }).join("") + "</fieldset>"
+      : '<p class="muted">Persönliche Aufgabe: ohne Bucket, Meilenstein und Zuweisung.</p>';
 
     dialog.innerHTML =
-      '<div class="dlg">' +
+      '<form class="dlg" data-task-form="' + esc(task.id) + '" novalidate>' +
         '<div class="dlg__head"><div>' +
           '<p class="dlg__context">' + (p ? esc(p.name) + (b ? " · " + esc(b.name) : "") : "Persönliche Aufgabe · ohne Projekt") + "</p>" +
           '<h2 id="dlg-title" class="dlg__title">' + esc(task.title) + "</h2>" +
           '<div class="dlg__badges">' + taskStatusBadge(task) + relationBadge(task) + "</div>" +
+          (done ? '<p class="dlg__done">' + esc(lastCompletionText(task)) + "</p>" : "") +
         "</div>" +
         '<button type="button" class="btn btn--icon btn--ghost" data-action="close-dialog" aria-label="Detailbereich schließen">✕</button>' +
         "</div>" +
         '<div class="dlg__body">' +
-          "<dl>" +
-            "<dt>Fälligkeit</dt><dd><span class=\"due " + due.cls + '">' + esc(due.text) + "</span></dd>" +
-            "<dt>Meilenstein</dt><dd>" + (m ? esc(m.name) + ' <span class="muted">(Plan ' + esc(fmtDate(m.approved)) + ")</span>" : '<span class="muted">Kein Meilenstein</span>') + "</dd>" +
-            "<dt>Bucket</dt><dd>" + (b ? esc(b.name) : '<span class="muted">–</span>') + "</dd>" +
-            "<dt>Zuständig</dt><dd>" + people + "</dd>" +
-            (p ? '<dt>Projekt</dt><dd><a href="#/projekt/' + esc(p.id) + '">' + esc(p.name) + "</a></dd>" : "") +
-          "</dl>" +
-          "<section><h3>Beschreibung</h3><p>" + esc(task.description) + "</p></section>" +
-          "<section><h3>Kommentare</h3>" + comments +
-            '<p class="muted small-hint">Kommentieren ist in der Vorschau nicht umgesetzt.</p></section>' +
+          '<p class="dlg-error" id="tf-error" role="alert" hidden></p>' +
+          '<div class="dlg-field"><label for="tf-title">Titel</label><input id="tf-title" name="title" type="text" maxlength="200" required value="' + esc(task.title) + '"></div>' +
+          '<div class="dlg-field"><label for="tf-desc">Beschreibung</label><textarea id="tf-desc" name="description" rows="3">' + esc(task.description || "") + "</textarea></div>" +
+          '<div class="dlg-row">' +
+            '<div class="dlg-field"><label for="tf-due">Fälligkeit</label><input id="tf-due" name="due" type="date" value="' + esc(task.due || "") + '"></div>' +
+            '<div class="dlg-field"><label for="tf-prio">Priorität</label><select id="tf-prio" name="priority">' +
+              PRIORITIES.map(function (x) { return option(x.key, x.label, x.key === (task.priority || "mittel")); }).join("") + "</select></div>" +
+          "</div>" +
+          projectFields +
+          '<section><h3>Kommentare</h3>' + comments +
+            '<div class="dlg-field"><label for="tf-comment">Kommentar hinzufügen</label><textarea id="tf-comment" rows="2"></textarea></div>' +
+            '<button type="button" class="btn btn--small" data-action="add-comment" data-task-id="' + esc(task.id) + '">Kommentar hinzufügen</button></section>' +
           '<section><h3>Verlauf</h3><ol class="timeline">' + history + "</ol></section>" +
         "</div>" +
         '<div class="dlg__foot">' +
-          '<span class="dlg__foot-hint">Simulation: Änderung nur in diesem Browser.</span>' +
-          '<button type="button" class="btn ' + (done ? "" : "btn--primary") + '" data-action="toggle-task" data-task-id="' + esc(task.id) + '">' +
-            (done ? "↺ Wiederöffnen" : "✓ Abschließen") + "</button>" +
+          '<span class="dlg__foot-hint">Konzeptskizze: Änderungen nur in diesem Browser.</span>' +
+          '<div class="dlg__actions">' +
+            '<button type="button" class="btn btn--danger" data-action="delete-task" data-task-id="' + esc(task.id) + '">Löschen</button>' +
+            '<button type="button" class="btn" data-action="toggle-task" data-task-id="' + esc(task.id) + '">' + (done ? "↺ Wiederöffnen" : "✓ Abschließen") + "</button>" +
+            '<button type="button" class="btn btn--ghost" data-action="close-dialog">Abbrechen</button>' +
+            '<button type="submit" class="btn btn--primary">Speichern</button>' +
+          "</div>" +
         "</div>" +
-      "</div>";
+      "</form>";
+  }
+
+  function saveTaskForm(form) {
+    var task = getTask(form.getAttribute("data-task-form"));
+    if (!task) { return; }
+    var title = form.elements.title.value.replace(/^\s+|\s+$/g, "");
+    var error = form.querySelector("#tf-error");
+    if (!title) {
+      error.textContent = "Bitte einen Titel eingeben.";
+      error.hidden = false;
+      form.elements.title.focus();
+      return;
+    }
+    task.title = title;
+    task.description = form.elements.description.value;
+    task.due = form.elements.due.value || task.due;
+    task.priority = form.elements.priority.value;
+    if (task.projectId) {
+      task.bucketId = form.elements.bucket.value;
+      task.milestoneId = form.elements.milestone.value || null;
+      var checked = form.querySelectorAll('input[name="assignee"]:checked');
+      var ids = [];
+      for (var i = 0; i < checked.length; i++) { ids.push(checked[i].value); }
+      task.assigneeIds = ids;
+    }
+    task.history.push({ type: "edited", by: me.id, at: stampNow() });
+    saveTasks();
+    renderRoute(false);
+    renderDialog(task);
+    var submit = dialog.querySelector('button[type="submit"]');
+    if (submit) { submit.focus(); }
+    toast("Gespeichert (nur in diesem Browser).");
+  }
+
+  function addComment(id) {
+    var task = getTask(id);
+    var field = dialog.querySelector("#tf-comment");
+    if (!task || !field) { return; }
+    var text = field.value.replace(/^\s+|\s+$/g, "");
+    if (!text) { field.focus(); return; }
+    var comment = { by: me.id, at: stampNow(), text: text };
+    task.comments.push(comment);
+    saveTasks();
+    // Nur die Liste ergänzen, damit ungespeicherte Eingaben im Formular erhalten bleiben
+    var listEl = dialog.querySelector("#tf-comments");
+    listEl.insertAdjacentHTML("beforeend", '<li class="comment">' + avatar(comment.by, false) + '<div class="comment__bubble"><p class="comment__meta">' +
+      esc(userName(comment.by)) + " · " + esc(fmtDateTime(comment.at)) + "</p><p>" + esc(comment.text) + "</p></div></li>");
+    field.value = "";
+    field.focus();
+    toast("Kommentar hinzugefügt.");
+  }
+
+  function deleteTask(id) {
+    var task = getTask(id);
+    if (!task) { return; }
+    if (!window.confirm("Aufgabe „" + task.title + "“ wirklich löschen? (Konzeptskizze, nur in diesem Browser)")) { return; }
+    state.tasks = state.tasks.filter(function (t) { return t.id !== id; });
+    saveTasks();
+    lastTriggerTaskId = null;
+    closeDialog();
+    renderRoute(false);
+    toast("Aufgabe gelöscht.");
   }
 
   function openTask(id) {
@@ -726,12 +979,21 @@
     var hash = (window.location.hash || "").replace(/^#\/?/, "");
     var parts = hash.split("/");
     var name = parts[0] || "arbeitsplatz";
-    if (name === "projekt") { return { name: "projekt", id: decodeURIComponent(parts[1] || "") }; }
+    if (name === "projekt") {
+      if (parts[2] === "m") {
+        return { name: "projekt", id: decodeURIComponent(parts[1] || ""), section: "meilenstein", ms: parts[3] || "" };
+      }
+      return { name: "projekt", id: decodeURIComponent(parts[1] || ""), section: journey.normalize(parts[2] || "uebersicht") };
+    }
     if (name === "projekte" || name === "management" || name === "arbeitsplatz") { return { name: name }; }
     return { name: "unbekannt" };
   }
 
   function updateNav(route) {
+    var subnav = document.getElementById("project-subnav");
+    if (subnav) {
+      subnav.innerHTML = route.name === "projekt" ? journey.renderSubnav(projectsById[route.id] || null, route.section) : "";
+    }
     var active = route.name === "projekt" ? "projekte" : route.name;
     var links = document.querySelectorAll(".app-nav__item[data-route]");
     for (var i = 0; i < links.length; i++) {
@@ -758,7 +1020,7 @@
     if (route.name === "arbeitsplatz") { html = renderWorkspace(); }
     else if (route.name === "projekte") { html = renderProjects(); }
     else if (route.name === "management") { html = renderManagement(); }
-    else if (route.name === "projekt") { html = renderProject(route.id); }
+    else if (route.name === "projekt") { html = renderProject(route.id, route.section, route.ms); }
     else {
       html = '<div class="page-head"><h1 tabindex="-1">Seite nicht gefunden</h1></div>' +
         emptyState("?", "Diese Ansicht gibt es in der Vorschau nicht", "", '<a class="btn" href="#/arbeitsplatz">Zum Arbeitsplatz</a>');
@@ -767,11 +1029,14 @@
     updateNav(route);
 
     var title = TITLES[route.name];
-    if (route.name === "projekt" && projectsById[route.id]) { title = projectsById[route.id].name; }
+    if (route.name === "projekt" && projectsById[route.id]) {
+      title = journey.sectionLabel(route.section, route.ms) + " · " + projectsById[route.id].name;
+    }
     document.title = title + " – Projekt X (Designvorschau)";
 
     if (moveFocus) {
-      var h1 = main.querySelector("h1");
+      // Bereichswechsel im Projekt: Fokus auf die Bereichsüberschrift, sonst auf h1
+      var h1 = (route.name === "projekt" && route.section !== "uebersicht" && main.querySelector("#j-title")) || main.querySelector("h1");
       if (h1) { h1.focus(); }
       window.scrollTo(0, 0);
     }
@@ -790,11 +1055,16 @@
       toggleTask(el.getAttribute("data-task-id"));
     } else if (action === "close-dialog") {
       closeDialog();
-    } else if (action === "set-filter") {
-      state.projectFilter = el.getAttribute("data-filter");
-      renderRoute(false);
-      var pressed = document.querySelector('#main [data-action="set-filter"][aria-pressed="true"]');
-      if (pressed) { pressed.focus(); }
+    } else if (action === "add-comment") {
+      addComment(el.getAttribute("data-task-id"));
+    } else if (action === "delete-task") {
+      deleteTask(el.getAttribute("data-task-id"));
+    } else if (action === "kanban-view") {
+      state.kanban.view = el.getAttribute("data-view") === "list" ? "list" : "board";
+      rerenderAndFocus('[data-action="kanban-view"][data-view="' + state.kanban.view + '"]');
+    } else if (action === "kanban-sort") {
+      state.kanban.sort = state.kanban.sort === "desc" ? "asc" : "desc";
+      rerenderAndFocus('[data-action="kanban-sort"]');
     } else if (action === "toggle-theme") {
       var value = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
       applyTheme(value);
@@ -802,10 +1072,12 @@
     } else if (action === "reset-data") {
       storageRemove(TASK_STORE_KEY);
       state.tasks = cloneTasks();
-      state.projectFilter = "offen";
+      state.kanban = defaultKanban();
       closeDialog();
       renderRoute(false);
       toast("Beispieldaten wurden zurückgesetzt.");
+    } else if (action.indexOf("journey-") === 0) {
+      rerenderAndFocus(journey.handleAction(action));
     } else if (action === "skip") {
       event.preventDefault();
       var h1 = document.querySelector("#main h1");
@@ -826,9 +1098,120 @@
       closeDialog();
     }
     var route = parseRoute();
-    if (route.name === "projekt" && state.lastRouteKey !== key) { state.projectFilter = "offen"; }
+    journey.closeMobile();
+    if (route.name === "projekt" && state.lastProjectId !== route.id) { state.kanban = defaultKanban(); }
+    state.lastProjectId = route.name === "projekt" ? route.id : null;
     state.lastRouteKey = key;
     renderRoute(true);
+  });
+
+  /* ---------------- Konzeptskizze F19 (journey.js) ---------------- */
+
+  var journey = window.PX_JOURNEY({
+    esc: esc,
+    fmtDate: fmtDate,
+    storageGet: storageGet,
+    storageSet: storageSet,
+    taskBoard: taskBoard,
+    taskStats: taskStats,
+    today: function () { return DATA.meta.today; }
+  });
+
+  function rerenderAndFocus(selector) {
+    renderRoute(false);
+    var target = selector ? document.querySelector(selector) : null;
+    if (target) { target.focus(); }
+  }
+
+  /* ---------------- Aufgabenboard: Filter, Formulare, Drag & Drop ---------------- */
+
+  function currentProject() {
+    var route = parseRoute();
+    return route.name === "projekt" ? projectsById[route.id] || null : null;
+  }
+
+  document.addEventListener("change", function (event) {
+    var el = event.target;
+    var filter = el.getAttribute && el.getAttribute("data-kanban-filter");
+    if (filter && filter !== "q") {
+      state.kanban[filter] = filter === "mine" ? el.checked : el.value;
+      rerenderAndFocus('[data-kanban-filter="' + filter + '"]');
+      return;
+    }
+    var statusId = el.getAttribute && el.getAttribute("data-kanban-status");
+    if (statusId) { setTaskStatus(statusId, el.value); }
+  });
+
+  // Suche: bei jeder Eingabe filtern, Fokus und Cursor bleiben im Suchfeld
+  document.addEventListener("input", function (event) {
+    var el = event.target;
+    if (!el.getAttribute || el.getAttribute("data-kanban-filter") !== "q") { return; }
+    state.kanban.q = el.value;
+    var pos = el.selectionStart;
+    renderRoute(false);
+    var field = document.querySelector('#main [data-kanban-filter="q"]');
+    if (field) {
+      field.focus();
+      try { field.setSelectionRange(pos, pos); } catch (e) { /* nicht unterstützt */ }
+    }
+  });
+
+  document.addEventListener("submit", function (event) {
+    var form = event.target;
+    if (form.getAttribute("data-task-form")) {
+      event.preventDefault();
+      saveTaskForm(form);
+      return;
+    }
+    var status = form.getAttribute("data-kanban-quick");
+    if (status) {
+      event.preventDefault();
+      var input = form.querySelector("input");
+      var title = input.value.replace(/^\s+|\s+$/g, "");
+      var p = currentProject();
+      if (title && p) { quickCreate(p, status, title); }
+    }
+  });
+
+  var dragId = null;
+
+  document.addEventListener("dragstart", function (event) {
+    var card = event.target.closest ? event.target.closest(".kb-card") : null;
+    if (!card) { return; }
+    dragId = card.getAttribute("data-task-id");
+    card.classList.add("is-dragging");
+    try { event.dataTransfer.setData("text/plain", dragId); } catch (e) { /* älterer Browser */ }
+    event.dataTransfer.effectAllowed = "move";
+  });
+
+  document.addEventListener("dragend", function (event) {
+    var card = event.target.closest ? event.target.closest(".kb-card") : null;
+    if (card) { card.classList.remove("is-dragging"); }
+    var over = document.querySelectorAll(".kb-col.is-over");
+    for (var i = 0; i < over.length; i++) { over[i].classList.remove("is-over"); }
+    dragId = null;
+  });
+
+  document.addEventListener("dragover", function (event) {
+    var col = event.target.closest ? event.target.closest("[data-kanban-drop]") : null;
+    if (!col || !dragId) { return; }
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    col.classList.add("is-over");
+  });
+
+  document.addEventListener("dragleave", function (event) {
+    var col = event.target.closest ? event.target.closest("[data-kanban-drop]") : null;
+    if (col && !col.contains(event.relatedTarget)) { col.classList.remove("is-over"); }
+  });
+
+  document.addEventListener("drop", function (event) {
+    var col = event.target.closest ? event.target.closest("[data-kanban-drop]") : null;
+    if (!col || !dragId) { return; }
+    event.preventDefault();
+    var id = dragId;
+    dragId = null;
+    setTaskStatus(id, col.getAttribute("data-kanban-drop"));
   });
 
   /* ---------------- Start ---------------- */
@@ -840,5 +1223,6 @@
     '<span class="current-user__text"><span>' + esc(me.name) + '</span><span class="current-user__role">Rolle: ' + esc(me.role) + "</span></span>";
 
   state.lastRouteKey = window.location.hash;
+  state.lastProjectId = parseRoute().id || null;
   renderRoute(false);
 })();
