@@ -20,7 +20,7 @@ Vorbereitungsstand vom 21. Oktober 2026. Noch keine Anwendungsimplementierung.
 14. `docs/entwurf-windows-betrieb.md`: Windows-Entwicklung, Windows-Betrieb, Pipeline und externe Demo (Revision 3, Entwurf).
 15. `docs/installationsliste-windows.md`: Lokale Installationen zur Freigabe durch den Benutzer.
 
-Der lokale Ordner ist die Arbeitskopie. Das private GitHub-Repository https://github.com/jago1698/projektmanagement-software ist erstellt und als origin verbunden. Die Grundvorbereitung ist hochgeladen. Claude kann die Unterlagen lesen und bestätigt alle acht geladenen Rollen einschließlich Projektleitung und Releasemanager. Lokal eingerichtet sind Python 3.13 (über uv), PostgreSQL 18 und ein Django-5.2-Grundgerüst ohne Oberfläche (Nachweise in docs/einrichtungsstand.md). Server, Domain, E-Mail-Dienst und Deployment-Pipeline sind noch nicht eingerichtet. Aktueller Arbeitsstand: docs/arbeitsstand.md.
+Der lokale Ordner ist die Arbeitskopie. Das private GitHub-Repository ist seit 22.10.2026 https://github.com/RSM-JGO/Projekt-X (neues Konto, als origin verbunden); das frühere Repository https://github.com/jago1698/projektmanagement-software ist als „alt“ eingetragen. Claude kann die Unterlagen lesen und bestätigt alle acht geladenen Rollen einschließlich Projektleitung und Releasemanager. Lokal eingerichtet sind Python 3.13 (über uv), PostgreSQL 18 und ein Django-5.2-Grundgerüst ohne Oberfläche (Nachweise in docs/einrichtungsstand.md). Server, Domain, E-Mail-Dienst und Deployment-Pipeline sind noch nicht eingerichtet. Aktueller Arbeitsstand: docs/arbeitsstand.md.
 
 ## Lokale Entwicklung (Windows, PowerShell)
 

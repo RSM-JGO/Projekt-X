@@ -8,7 +8,7 @@ Der Benutzer soll die Entwicklung nach abgeschlossener Einrichtung direkt in Cla
 
 ## Vorhanden und geprüft
 
-- Privates GitHub-Repository: https://github.com/jago1698/projektmanagement-software.
+- Privates GitHub-Repository: https://github.com/RSM-JGO/Projekt-X (neues Konto seit 22.10.2026, origin). Früheres Repository https://github.com/jago1698/projektmanagement-software als Remote „alt“.
 - Lokaler Ordner: C:\Users\jango\Documents\Projektmanagement-Software.
 - Git for Windows regulär installiert; Pfad und Aufruf ohne vollständige Pfadangabe in neu gestarteter Claude-Sitzung bestätigt.
 - Projektgrundlage, gemeinsames Backlog und Arbeitsregeln vorhanden.

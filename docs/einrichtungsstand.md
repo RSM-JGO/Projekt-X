@@ -98,3 +98,10 @@ Claudes Einrichtungsbericht wurde teilweise vor dem ersten Commit erstellt. Sein
 - Styleguide gemeinsam festlegen.
 - Dev-/Prod-Trennung und Deployment-Pipeline konkretisieren und später umsetzen.
 - Anwendung und Betriebsumgebungen sind noch nicht implementiert.
+
+## Wechsel des GitHub-Kontos (22.10.2026)
+
+- Neues privates Repository **https://github.com/RSM-JGO/Projekt-X** (Konto RSM-JGO).
+- Upload mit kompletter Historie (14 Commits, Stand `8ff8ea0`) durch den Benutzer per `git push -u neu main`. Die Anmeldung war aus Claudes Hintergrundfenster nicht möglich.
+- Nachprüfung: `git ls-remote` zeigt `refs/heads/main` = `8ff8ea0`.
+- Remotes umgestellt: `origin` = neues Repository, `alt` = https://github.com/jago1698/projektmanagement-software.

@@ -30,21 +30,19 @@ Der Umzugsordner liegt auf dem alten PC unter `C:\Users\jango\Documents\ProjektX
 5. Benutzer-Umgebungsvariable setzen, wie auf dem alten PC; das Demo-Skript erwartet sie: `[Environment]::SetEnvironmentVariable('UV_PYTHON_INSTALL_DIR', "$env:USERPROFILE\.uv\python", 'User')`. Danach ein **neues** PowerShell-Fenster öffnen.
 6. Python 3.13: `uv python install 3.13`
 
-## Schritt 3 – Projekt aus dem Paket holen und ins neue Konto hochladen
+## Schritt 3 – Projekt holen
 
-Den Umzugsordner z. B. nach `C:\Users\<Name>\Documents\ProjektX-Umzug` kopieren, dann in PowerShell:
+Das Projekt liegt bereits mit kompletter Historie im neuen Repository https://github.com/RSM-JGO/Projekt-X (am 22.10.2026 vom alten PC hochgeladen). Auf dem neuen PC in PowerShell:
 
 ```powershell
-cd $env:USERPROFILE\Documents
-git clone ProjektX-Umzug\projektx.bundle Projektmanagement-Software
+cd $env:USERPROFILEDocuments
+git clone https://github.com/RSM-JGO/Projekt-X.git Projektmanagement-Software
 cd Projektmanagement-Software
-git remote set-url origin https://github.com/NEUER-NAME/projektmanagement-software.git
-git config user.name "NEUER-NAME"
-git config user.email "ID+NEUER-NAME@users.noreply.github.com"
-git push -u origin main
+git config user.name "RSM-JGO"
+git config user.email "ID+RSM-JGO@users.noreply.github.com"
 ```
 
-Die noreply-Adresse steht in GitHub unter Settings → Emails. Beim ersten `git push` öffnet sich ein Anmeldefenster; dort melden Sie sich mit dem **neuen** Konto an.
+Die noreply-Adresse steht in GitHub unter Settings → Emails. Das Git-Paket `projektx.bundle` im Umzugsordner ist nur noch eine Reserve.
 
 ## Schritt 4 – Einstellungen und Datenbanken
 
